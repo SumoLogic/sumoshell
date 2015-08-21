@@ -123,7 +123,7 @@ func (handler *RawInputHandler) Process(inp []byte) {
 	runes := bytes.Runes(inp)
 	// If not whitespace, flush, append
 	if len(runes) > 0 && !whitespace.IsWhitespace(runes[0]) {
-		handler.flush()
+		handler.Flush()
 		handler.buff = append(handler.buff, runes...)
 	} else {
 		// If it is whitespace, just append with a newline
@@ -140,7 +140,7 @@ func NewRawInputHandlerStdout() *RawInputHandler {
 	return NewRawInputHandler(os.Stdout)
 }
 
-func (handler *RawInputHandler) flush() {
+func (handler *RawInputHandler) Flush() {
 	m := make(map[string]interface{})
 	m[Raw] = string(handler.buff)
 	m[Type] = Plus

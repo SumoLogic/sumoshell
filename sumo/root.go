@@ -24,6 +24,7 @@ func read(filterString string) {
 		handler.Process(line)
 		line, hasMoreInLine, err = bio.ReadLine()
 	}
+	handler.Flush()
 }
 
 type SumoFilter struct {
