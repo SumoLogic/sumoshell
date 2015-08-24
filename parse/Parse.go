@@ -2,7 +2,7 @@ package main
 import "log"
 import "os"
 import "strings"
-import "github.com/rcoh/sumo-line/util"
+import "github.com/SumoLogic/sumoshell/util"
 import "regexp"
 
 type Parser struct {

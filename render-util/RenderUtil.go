@@ -1,6 +1,6 @@
 package render
 import (
-	"github.com/rcoh/sumo-line/util"
+    "github.com/SumoLogic/sumoshell/util"
 	"sort"
 	"strings"
 	"fmt"

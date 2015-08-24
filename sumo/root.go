@@ -3,7 +3,7 @@ package main
 import "os"
 import "bufio"
 import "io"
-import "github.com/rcoh/sumo-line/util"
+import "github.com/SumoLogic/sumoshell/util"
 import "strings"
 
 func main() {

@@ -1,6 +1,6 @@
 package grouper
 import  (
-	"github.com/rcoh/sumo-line/util"
+	"github.com/SumoLogic/sumoshell/util"
 	"strings"
 	"fmt"
 	"sync"

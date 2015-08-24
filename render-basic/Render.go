@@ -1,8 +1,8 @@
 package main
 
 import "fmt"
-import "github.com/rcoh/sumo-line/util"
-import "github.com/rcoh/sumo-line/render-util"
+import "github.com/SumoLogic/sumoshell/util"
+import "github.com/SumoLogic/sumoshell/render-util"
 import "strings"
 import "os/exec"
 import "os"

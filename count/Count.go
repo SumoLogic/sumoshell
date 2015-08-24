@@ -1,8 +1,8 @@
 package main
 import (
 	"os"
-	"github.com/rcoh/sumo-line/util"
-	"github.com/rcoh/sumo-line/group"
+	"github.com/SumoLogic/sumoshell/util"
+	"github.com/SumoLogic/sumoshell/group"
 	"time"
 )
 

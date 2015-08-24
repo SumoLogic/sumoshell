@@ -5,7 +5,7 @@ package main
 
 import (
 	ui "github.com/gizak/termui"
-	"github.com/rcoh/sumo-line/render-util"
+	"github.com/SumoLogic/sumoshell/render-util"
 	"fmt"
 	"strconv"
 )

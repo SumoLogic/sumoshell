@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"log"
 	"github.com/jroimartin/gocui"
-	//"github.com/rcoh/sumo-line/util"
-	"github.com/rcoh/sumo-line/render-util"
+    "github.com/SumoLogic/sumoshell/render-util"
 )
 
 // Need to determine all the columns in the current data, then render based on that
