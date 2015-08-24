@@ -1,6 +1,6 @@
 # sumoshell
 Sumo shell is a partial implementation of the Sumo Logic stream pipeline written in Go. Commands should start with
-`sumo` which will transform logs into the json format sumoshell uses. Commands should end with `render` `render-basic` or `graph` which render the output to the terminal. 
+`sumo` which will transform logs into the json format sumoshell uses. Commands should end with `render` `render-basic` or `graph` which render the output to the terminal. Each operator is a stand-alone binary allowing them to be easily composed.
 
 ## Installation
 Currently no binaries are provided for Sumoshell, however it's easy to build from source. Given a working [go](https://golang.org/doc/install) installation, run:
@@ -37,7 +37,7 @@ After using the `sumo` operator, the output will be in JSON. To re-render the ou
 1. `render-basic`: Capable of rendering aggregate and non-aggregate data. Mimics curses style CLIs by calculating the terminal height and printing new lines to the end to keep your text aligned.
 2. `render`: Curses based renderer for rendering tabular data
 3. `graph`: Curses based renderer for rendering tabular data as a bar chart.
-4. 
+
 
 ### Parsing Data
 
