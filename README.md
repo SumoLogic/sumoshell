@@ -37,3 +37,36 @@ After using the `sumo` operator, the output will be in JSON. To re-render the ou
 1. `render-basic`: Capable of rendering aggregate and non-aggregate data. Mimics curses style CLIs by calculating the terminal height and printing new lines to the end to keep your text aligned.
 2. `render`: Curses based renderer for rendering tabular data
 3. `graph`: Curses based renderer for rendering tabular data as a bar chart.
+4. 
+
+### Parsing Data
+
+sumoshell supports a basic parse operator similar to the `parse` operator in `SumoLogic`. Queries take the form:
+```
+... | parse "[pattern=*] pattern2:'*' <morePatterns=(*)" as pattern, pattern2, more | ...
+```
+
+This will either extract all the variables from the log line or none of them, dropping the log line.
+
+### Aggregating Data
+
+sumoshell currently supports 3 aggregate operators:
+
+1. `count`. Example queries:
+  ```
+  ... | count # number of rows
+  ... | count key # number of rows per key
+  ... | count key value # number of rows per the cartesian product of (key, value)
+  ```
+
+2. `sumosum` Example queries:
+  ```
+  ... | sumosum k # sum of all k's
+  ... | sumosum v by k # sum of all v's by k
+  ```
+
+3. `average` Example queries:
+  ```
+  ... | average k # average of all k's
+  ... | average v by k # average of all v's by k
+  ```
