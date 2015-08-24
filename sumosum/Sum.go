@@ -1,10 +1,11 @@
 package main
+
 import (
-	"os"
-    "github.com/SumoLogic/sumoshell/util"
-    "github.com/SumoLogic/sumoshell/group"
-	"strconv"
 	"fmt"
+	"github.com/SumoLogic/sumoshell/group"
+	"github.com/SumoLogic/sumoshell/util"
+	"os"
+	"strconv"
 	"time"
 )
 
@@ -12,7 +13,7 @@ type sum struct {
 	sum *float64
 	key string
 	// DO NOT MODIFY BASE
-	base map[string]interface{}
+	base   map[string]interface{}
 	output func(map[string]interface{})
 }
 
@@ -55,13 +56,13 @@ func main() {
 func flush(sumOp sum, ticker *time.Ticker) {
 	for {
 		select {
-			case <- ticker.C:
-				sumOp.Flush()
+		case <-ticker.C:
+			sumOp.Flush()
 		}
 	}
 }
 
-func (sumOp sum)Flush() {
+func (sumOp sum) Flush() {
 	sumOp.output(util.CreateStartRelation())
 	sumOp.output(util.CreateRelation(currentState(sumOp)))
 	sumOp.output(util.CreateEndRelation())

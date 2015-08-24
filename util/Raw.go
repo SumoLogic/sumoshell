@@ -11,7 +11,7 @@ import "log"
 
 type RawInputHandler struct {
 	output io.Writer
-	buff []rune
+	buff   []rune
 }
 
 type SumoOperator interface {
@@ -24,8 +24,8 @@ type SumoAggOperator interface {
 }
 
 func ConnectToStdIn(operator SumoOperator) {
-    fi, _ := os.Stdin.Stat() // get the FileInfo struct describing the standard input.
-    if (fi.Mode() & os.ModeCharDevice) == 0 {
+	fi, _ := os.Stdin.Stat() // get the FileInfo struct describing the standard input.
+	if (fi.Mode() & os.ModeCharDevice) == 0 {
 		ConnectToReader(operator, os.Stdin)
 	} else {
 		fmt.Printf("No input")
@@ -39,7 +39,7 @@ func ConnectToReader(operator SumoOperator, reader io.Reader) {
 	var buf []byte
 	for err != io.EOF {
 		buf = append(buf, line...)
-		if (!hasMoreInLine && len(buf) > 0) {
+		if !hasMoreInLine && len(buf) > 0 {
 			var rawMsg interface{}
 			err := json.Unmarshal(buf, &rawMsg)
 			buf = []byte{}
@@ -57,7 +57,6 @@ func ConnectToReader(operator SumoOperator, reader io.Reader) {
 		line, hasMoreInLine, err = bio.ReadLine()
 	}
 }
-
 
 const Plus = "PLUS"
 const StartRelation = "StartRelation"

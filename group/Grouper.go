@@ -1,29 +1,30 @@
 package grouper
-import  (
-	"github.com/SumoLogic/sumoshell/util"
-	"strings"
+
+import (
 	"fmt"
+	"github.com/SumoLogic/sumoshell/util"
+	"os"
+	"strings"
 	"sync"
 	"time"
-	"os"
 )
 
 type Grouper struct {
-	constructor func(map[string]interface{})util.SumoAggOperator
-	operators map[string]util.SumoAggOperator
-	merger Merger
-	by []string
-	key string
+	constructor func(map[string]interface{}) util.SumoAggOperator
+	operators   map[string]util.SumoAggOperator
+	merger      Merger
+	by          []string
+	key         string
 }
 
-type builder func(Merger, string, map[string]interface{})util.SumoAggOperator
+type builder func(Merger, string, map[string]interface{}) util.SumoAggOperator
 
 func NewAggregate(
-		constructor builder,
-		by []string,
-		key string) Grouper {
+	constructor builder,
+	by []string,
+	key string) Grouper {
 	merger := NewMerger()
-	ctor := func(base map[string]interface{})util.SumoAggOperator {
+	ctor := func(base map[string]interface{}) util.SumoAggOperator {
 		return constructor(merger, key, base)
 	}
 	return Grouper{ctor, make(map[string]util.SumoAggOperator), merger, by, key}
@@ -46,7 +47,7 @@ func (g Grouper) Process(inp map[string]interface{}) {
 			keys = append(keys, "")
 		}
 	}
-	
+
 	groupKey := strings.Join(keys, "-")
 
 	_, ok := g.operators[groupKey]
@@ -66,8 +67,8 @@ func (g Grouper) Process(inp map[string]interface{}) {
 type Merger struct {
 	// one map for each grouper
 	aggregate map[int]map[string]interface{}
-	output *util.JsonWriter
-	mu *sync.Mutex
+	output    *util.JsonWriter
+	mu        *sync.Mutex
 }
 
 func NewMerger() Merger {
@@ -79,6 +80,7 @@ func NewMerger() Merger {
 }
 
 const Id = "_Id"
+
 func ExtractId(inp map[string]interface{}) int {
 	raw, ok := inp[Id].(int)
 	if ok {
@@ -88,8 +90,8 @@ func ExtractId(inp map[string]interface{}) int {
 	}
 }
 
-func WithId(id int)map[string]interface{} {
-	return map[string]interface{}{Id:id}
+func WithId(id int) map[string]interface{} {
+	return map[string]interface{}{Id: id}
 }
 
 func (m Merger) Process(inp map[string]interface{}) {
@@ -119,8 +121,8 @@ func (m Merger) Flush() {
 func flush(m Merger, ticker *time.Ticker) {
 	for {
 		select {
-			case <- ticker.C:
-				m.Flush()
+		case <-ticker.C:
+			m.Flush()
 		}
 	}
 }

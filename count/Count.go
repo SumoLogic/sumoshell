@@ -1,14 +1,15 @@
 package main
+
 import (
-	"os"
-	"github.com/SumoLogic/sumoshell/util"
 	"github.com/SumoLogic/sumoshell/group"
+	"github.com/SumoLogic/sumoshell/util"
+	"os"
 	"time"
 )
 
 type count struct {
-	ct *int
-	base map[string]interface{}
+	ct     *int
+	base   map[string]interface{}
 	output func(map[string]interface{})
 }
 
@@ -46,13 +47,13 @@ func main() {
 func flush(ct count, ticker *time.Ticker) {
 	for {
 		select {
-			case <- ticker.C:	
-				ct.Flush()
+		case <-ticker.C:
+			ct.Flush()
 		}
 	}
 }
 
-func (ct count)Flush() {
+func (ct count) Flush() {
 	ct.output(util.CreateStartRelation())
 	ct.output(util.CreateRelation(currentState(ct)))
 	ct.output(util.CreateEndRelation())

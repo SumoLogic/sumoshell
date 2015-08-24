@@ -1,20 +1,21 @@
 package main
+
 import (
-	"os"
-	"github.com/SumoLogic/sumoshell/util"
-	"github.com/SumoLogic/sumoshell/group"
-	"strconv"
 	"fmt"
+	"github.com/SumoLogic/sumoshell/group"
+	"github.com/SumoLogic/sumoshell/util"
+	"os"
+	"strconv"
 	"time"
 )
 
 type average struct {
 	samples *int
-	sum *float64
-	key string
+	sum     *float64
+	key     string
 	// DO NOT MODIFY BASE
-	base map[string]interface{}
-	ready *bool
+	base   map[string]interface{}
+	ready  *bool
 	output func(map[string]interface{})
 }
 
@@ -61,17 +62,17 @@ func main() {
 func flush(avg average, ticker *time.Ticker) {
 	for {
 		select {
-			case <- ticker.C:
-				avg.Flush()
+		case <-ticker.C:
+			avg.Flush()
 		}
 	}
 }
 
-func (avg average)Flush() {
+func (avg average) Flush() {
 	if *avg.ready {
-			avg.output(util.CreateStartRelation())
-			avg.output(util.CreateRelation(currentState(avg)))
-			avg.output(util.CreateEndRelation())
+		avg.output(util.CreateStartRelation())
+		avg.output(util.CreateRelation(currentState(avg)))
+		avg.output(util.CreateEndRelation())
 	}
 }
 

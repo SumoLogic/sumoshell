@@ -1,4 +1,5 @@
 package main
+
 import "log"
 import "os"
 import "strings"
@@ -6,14 +7,15 @@ import "github.com/SumoLogic/sumoshell/util"
 import "regexp"
 
 type Parser struct {
-	pattern string
+	pattern     string
 	extractions []string
-	regex *regexp.Regexp
-	output *util.JsonWriter
+	regex       *regexp.Regexp
+	output      *util.JsonWriter
 }
 
 const Wildcard = '*'
 const genericError = "parse takes arguments like: `parse \"[key=*]\" as key`\n"
+
 func main() {
 
 	if len(os.Args) < 2 {
@@ -23,24 +25,24 @@ func main() {
 	}
 	parseExpression := os.Args[1]
 	numExtractions := findNumExtractions(parseExpression)
-	//         (parse, str)	(as)  (foo, bar, baz)			
-	expectedArgs := 2 +       1  +  numExtractions
-	if (len(os.Args) < expectedArgs) {
+	//         (parse, str)	(as)  (foo, bar, baz)
+	expectedArgs := 2 + 1 + numExtractions
+	if len(os.Args) < expectedArgs {
 		log.Printf(genericError)
 		log.Printf("Expected more arguments\n")
 		return
 	}
 	as := os.Args[2]
-	if (as != "as") {
+	if as != "as" {
 		log.Printf(genericError)
 		log.Printf("Expected `as`\n")
 		return
 	}
-	extractions := make([]string, len(os.Args) - 3)
+	extractions := make([]string, len(os.Args)-3)
 	for i, arg := range os.Args[3:] {
 		extractions[i] = strings.Trim(arg, ",")
 	}
-	util.ConnectToStdIn(Parser{parseExpression, extractions, 
+	util.ConnectToStdIn(Parser{parseExpression, extractions,
 		regexFromPat(parseExpression), util.NewJsonWriter()})
 }
 
@@ -60,9 +62,9 @@ func regexFromPat(pat string) *regexp.Regexp {
 }
 
 func (p Parser) Process(inp map[string]interface{}) {
-	if (util.IsPlus(inp)) {
+	if util.IsPlus(inp) {
 		matches := p.regex.FindStringSubmatch(util.ExtractRaw(inp))
-		if len(matches) == 1 + len(p.extractions) {
+		if len(matches) == 1+len(p.extractions) {
 			for i, match := range matches[1:] {
 				inp[p.extractions[i]] = match
 			}

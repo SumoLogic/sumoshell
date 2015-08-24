@@ -4,9 +4,9 @@
 package main
 
 import (
-	ui "github.com/gizak/termui"
-	"github.com/SumoLogic/sumoshell/render-util"
 	"fmt"
+	"github.com/SumoLogic/sumoshell/render-util"
+	ui "github.com/gizak/termui"
 	"strconv"
 )
 
@@ -22,7 +22,6 @@ func createUi(state *render.RenderState) {
 	}
 	defer ui.Close()
 	ui.UseTheme("helloworld")
-
 
 	bc := ui.NewBarChart()
 	data := []int{}
@@ -55,7 +54,7 @@ func createUi(state *render.RenderState) {
 		if ok {
 			bc.Border.Label = query.(string)
 		}
-	
+
 		dataCol := render.NumericColumn(columns)
 		data := []int{}
 		labels := []string{}
@@ -75,12 +74,12 @@ func createUi(state *render.RenderState) {
 			numCols = 1
 		}
 
-		bc.BarWidth = (ui.TermWidth()-10) / numCols
+		bc.BarWidth = (ui.TermWidth() - 10) / numCols
 		bc.DataLabels = labels
 		redraw <- true
 		return nil
 	}
-	
+
 	state.Flush = update
 	evt := ui.EventCh()
 
@@ -106,21 +105,20 @@ func createUi(state *render.RenderState) {
 	}
 }
 
+/*spark := ui.Sparkline{}
+spark.Height = ui.TermHeight() - 6
+spdata := sinpsint
+spark.Data = spdata[:100]
+spark.LineColor = ui.ColorCyan
+spark.TitleColor = ui.ColorWhite
 
-	/*spark := ui.Sparkline{}
-	spark.Height = ui.TermHeight() - 6
-	spdata := sinpsint
-	spark.Data = spdata[:100]
-	spark.LineColor = ui.ColorCyan
-	spark.TitleColor = ui.ColorWhite
+sp := ui.NewSparklines(spark)
+sp.Height = ui.TermHeight() - 3
+sp.Border.Label = "Sparkline"
 
-	sp := ui.NewSparklines(spark)
-	sp.Height = ui.TermHeight() - 3
-	sp.Border.Label = "Sparkline"
-
-	lc := ui.NewLineChart()
-	lc.Border.Label = "braille-mode Line Chart"
-	lc.Data = sinps
-	lc.Height = 11
-	lc.AxesColor = ui.ColorWhite
-	lc.LineColor = ui.ColorYellow | ui.AttrBold*/
+lc := ui.NewLineChart()
+lc.Border.Label = "braille-mode Line Chart"
+lc.Data = sinps
+lc.Height = 11
+lc.AxesColor = ui.ColorWhite
+lc.LineColor = ui.ColorYellow | ui.AttrBold*/

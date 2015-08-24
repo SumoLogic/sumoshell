@@ -11,7 +11,7 @@ func main() {
 		read(os.Args[1])
 	} else {
 		read("")
-	}	
+	}
 }
 
 func read(filterString string) {
@@ -28,7 +28,7 @@ func read(filterString string) {
 }
 
 type SumoFilter struct {
-	param string
+	param  string
 	output *util.JsonWriter
 }
 
@@ -37,4 +37,3 @@ func (filt SumoFilter) Process(inp map[string]interface{}) {
 		filt.output.Write(inp)
 	}
 }
-

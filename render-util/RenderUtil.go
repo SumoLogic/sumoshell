@@ -1,9 +1,10 @@
 package render
+
 import (
-    "github.com/SumoLogic/sumoshell/util"
+	"fmt"
+	"github.com/SumoLogic/sumoshell/util"
 	"sort"
 	"strings"
-	"fmt"
 )
 
 func uiColumn(column string) bool {
@@ -19,7 +20,7 @@ func Columns(inp []map[string]interface{}) map[string]int {
 		for k, v := range m {
 			if uiColumn(k) {
 				var effectiveLength int
-				if (length(k) > length(v)) {
+				if length(k) > length(v) {
 					effectiveLength = length(k)
 				} else {
 					effectiveLength = length(v)
@@ -33,9 +34,11 @@ func Columns(inp []map[string]interface{}) map[string]int {
 	return res
 }
 
-func ColumnNames(columns map[string]int)[]string {
+func ColumnNames(columns map[string]int) []string {
 	viewNames := []string{}
-	for k, _ := range columns { viewNames = append(viewNames,k) }
+	for k, _ := range columns {
+		viewNames = append(viewNames, k)
+	}
 	sort.Strings(viewNames)
 	return viewNames
 }
@@ -71,19 +74,19 @@ func length(inp interface{}) int {
 
 type RenderState struct {
 	Messages *[]map[string]interface{}
-	Meta *map[string]interface{}
-	Flush func() error
+	Meta     *map[string]interface{}
+	Flush    func() error
 }
 
 func NewConnectedRenderState(flush func() error) *RenderState {
 	messages := make([]map[string]interface{}, 0)
 	meta := make(map[string]interface{})
-    state := &RenderState{&messages, &meta, flush}
-    go util.ConnectToStdIn(state)
-    return state
+	state := &RenderState{&messages, &meta, flush}
+	go util.ConnectToStdIn(state)
+	return state
 }
 
-func (state RenderState)Process(inp map[string]interface{}) {
+func (state RenderState) Process(inp map[string]interface{}) {
 	if util.IsStartRelation(inp) {
 		newmap := make([]map[string]interface{}, 0)
 		*state.Messages = newmap
@@ -97,6 +100,6 @@ func (state RenderState)Process(inp map[string]interface{}) {
 		*state.Messages = append(*state.Messages, inp)
 		state.Flush()
 	} else {
-		// :-( no type information	
+		// :-( no type information
 	}
 }
