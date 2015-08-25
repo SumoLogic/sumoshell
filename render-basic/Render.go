@@ -9,6 +9,7 @@ import "os"
 import "strconv"
 
 type Renderer struct {
+	showRaw     bool
 	colWidths   *map[string]int
 	cols        *[]string
 	height      int64
@@ -25,24 +26,33 @@ func main() {
 	hstr := strings.Trim(wh[0], "\n")
 	rows := int64(0)
 	height, _ := strconv.ParseInt(hstr, 10, 64)
-	util.ConnectToStdIn(Renderer{&m, &cols, height, &rows})
+
+	if len(os.Args) == 2 && os.Args[1] == "noraw" {
+		util.ConnectToStdIn(Renderer{false, &m, &cols, height, &rows})
+	} else {
+		util.ConnectToStdIn(Renderer{true, &m, &cols, height, &rows})
+	}
 }
 
 func (r Renderer) Process(inp map[string]interface{}) {
 	if util.IsPlus(inp) {
 		var printed = false
-		for k, v := range inp {
-			if !strings.HasPrefix(k, "_") {
-				vStr := fmt.Sprint(v)
-				fmt.Printf("[%v=%s]", k, vStr)
-				printed = true
-			}
+		colsWidth := render.Columns([]map[string]interface{}{inp})
+		colNames := render.ColumnNames(colsWidth)
+		*r.cols = colNames
+		*r.colWidths = colsWidth
+		for _, col := range colNames {
+			v, _ := inp[col]
+			vStr := fmt.Sprint(v)
+			spaces := strings.Repeat(" ", (len(col)+3+colsWidth[col])-len(vStr))
+			fmt.Printf("[%s=%v]%s", col, vStr, spaces)
 		}
 		if printed {
 			fmt.Printf(";")
 		}
-		fmt.Printf(util.ExtractRaw(inp))
-		*r.rowsPrinted += 1
+		if r.showRaw {
+			fmt.Printf(util.ExtractRaw(inp))
+		}
 		fmt.Print("\n")
 	}
 	if util.IsStartRelation(inp) {

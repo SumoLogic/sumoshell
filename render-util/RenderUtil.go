@@ -11,6 +11,10 @@ func uiColumn(column string) bool {
 	if column == util.Type {
 		return false
 	}
+
+    if column == "_raw" {
+        return false
+    }
 	return true
 }
 
