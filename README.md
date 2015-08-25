@@ -12,7 +12,7 @@ go install ./...
 ```
 
 ## Usage
-Like [SumoLogic](www.sumologic.com), sumoshell enables you pass log data through a series of transformations to get your final result. Pipelines start with a source (`tail`, `cat`, etc.) followed by the `sumo` operator. An example pipeline might be:
+Like [SumoLogic](https://www.sumologic.com), sumoshell enables you pass log data through a series of transformations to get your final result. Pipelines start with a source (`tail`, `cat`, etc.) followed by the `sumo` operator. An example pipeline might be:
 
 ```tail -f logfile | sumo "ERROR" | parse "thread=*]" | count thread | render-basic```
 
