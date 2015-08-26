@@ -3,7 +3,9 @@ Sumo shell is a partial implementation of the Sumo Logic stream pipeline written
 `sumo` which will transform logs into the json format sumoshell uses. Commands should end with `render` `render-basic` or `graph` which render the output to the terminal. Each operator is a stand-alone binary allowing them to be easily composed.
 
 ## Installation
-Currently no binaries are provided for Sumoshell, however it's easy to build from source. Given a working [go](https://golang.org/doc/install) installation, run:
+Currently [OSX binaries are provided for sumoshell](https://github.com/SumoLogic/sumoshell/releases). Simply extract the archive and place the binaries on your path. 
+
+If you run a different OS or would prefer to install from source, it's easy to build from source. Given a working [go](https://golang.org/doc/install) installation, run:
 ```
 go get github.com/SumoLogic/sumoshell
 cd $GOPATH/src/github.com/SumoLogic/sumoshell # Will warn about `no buildable go source`
