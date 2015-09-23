@@ -51,7 +51,7 @@ func createUi(state *render.RenderState) {
 		bars := render.Columns(*state.Messages)
 		columns := render.ColumnNames(bars)
 		query, ok := (*state.Meta)["_queryString"]
-		if ok {
+		if ok && query.(string) != bc.Border.Label {
 			bc.Border.Label = query.(string)
 		}
 
@@ -74,8 +74,14 @@ func createUi(state *render.RenderState) {
 			numCols = 1
 		}
 
-		bc.BarWidth = (ui.TermWidth() - 10) / numCols
-		bc.DataLabels = labels
+		newBarWidth := (ui.TermWidth() - 10) / numCols
+		if int(newBarWidth) != int(bc.BarWidth) {
+			bc.BarWidth = newBarWidth
+		}
+
+		if len(labels) != len(bc.DataLabels) {
+			bc.DataLabels = labels
+		}
 		redraw <- true
 		return nil
 	}
@@ -104,21 +110,3 @@ func createUi(state *render.RenderState) {
 		}
 	}
 }
-
-/*spark := ui.Sparkline{}
-spark.Height = ui.TermHeight() - 6
-spdata := sinpsint
-spark.Data = spdata[:100]
-spark.LineColor = ui.ColorCyan
-spark.TitleColor = ui.ColorWhite
-
-sp := ui.NewSparklines(spark)
-sp.Height = ui.TermHeight() - 3
-sp.Border.Label = "Sparkline"
-
-lc := ui.NewLineChart()
-lc.Border.Label = "braille-mode Line Chart"
-lc.Data = sinps
-lc.Height = 11
-lc.AxesColor = ui.ColorWhite
-lc.LineColor = ui.ColorYellow | ui.AttrBold*/

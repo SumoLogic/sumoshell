@@ -30,7 +30,6 @@ func main() {
 	width, _ := strconv.ParseInt(wstr, 10, 64)
 
 	rows := int64(0)
-	fmt.Println("%v", width)
 
 	if len(os.Args) == 2 && os.Args[1] == "noraw" {
 		util.ConnectToStdIn(Renderer{false, &m, &cols, height, width, &rows})

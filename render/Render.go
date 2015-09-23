@@ -15,7 +15,6 @@ func makeLayout(state *render.RenderState) layoutFunc {
 		viewColumns := render.Columns(*state.Messages)
 		viewNames := render.ColumnNames(viewColumns)
 		var pos = 0
-		//log.Println(viewColumns)
 		for _, key := range viewNames {
 			width := viewColumns[key]
 			if v, err := g.SetView(key, pos, 0, pos+width, maxY); err != nil {
@@ -62,8 +61,6 @@ func main() {
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
 		log.Panicln(err)
 	}
-
-	//go
 
 	g.MainLoop()
 
