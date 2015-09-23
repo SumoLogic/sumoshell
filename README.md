@@ -48,7 +48,14 @@ sumoshell supports a basic parse operator similar to the `parse` operator in `Su
 ... | parse "[pattern=*] pattern2:'*' <morePatterns=(*)" as pattern, pattern2, more | ...
 ```
 
-This will either extract all the variables from the log line or none of them, dropping the log line.
+### Filtering Data
+
+sumoshell supports a filter operator similar to the `where` operator in `SumoLogic`. Queries take the form:
+```
+... | parse "[host=*]" as host | filter host = server1 
+```
+
+This will drop any log lines that don't have `server1` as the host.
 
 ### Aggregating Data
 
