@@ -36,8 +36,8 @@ The sumo operator performs 3 steps:
 
 After using the `sumo` operator, the output will be in JSON. To re-render the output in a human-readable form, `|` the results of your query into one of the three `render` operators.
 
-1. `render-basic`: Capable of rendering aggregate and non-aggregate data. Mimics curses style CLIs by calculating the terminal height and printing new lines to the end to keep your text aligned.
-2. `render`: Curses based renderer for rendering tabular data
+1. `render-basic`: Capable of rendering aggregate and non-aggregate data. Mimics curses style CLIs by calculating the terminal height and printing new lines to the end to keep your text aligned. Add `nowraw` to drop the raw data when an aggregate isn't present.
+2. `render`: Curses based renderer for rendering tabular data.
 3. `graph`: Curses based renderer for rendering tabular data as a bar chart.
 
 
@@ -45,7 +45,7 @@ After using the `sumo` operator, the output will be in JSON. To re-render the ou
 
 sumoshell supports a basic parse operator similar to the `parse` operator in `SumoLogic`. Queries take the form:
 ```
-... | parse "[pattern=*] pattern2:'*' <morePatterns=(*)" as pattern, pattern2, more | ...
+... | parse "[pattern=*] pattern2:'*' morePatterns=(*)" as pattern, pattern2, more | ...
 ```
 
 This will either extract all the variables from the log line or none of them, dropping the log line.
