@@ -3,7 +3,7 @@ Sumo shell is a partial implementation of the Sumo Logic stream pipeline written
 `sumo` which will transform logs into the json format sumoshell uses. Commands should end with `render` `render-basic` or `graph` which render the output to the terminal. Each operator is a stand-alone binary allowing them to be easily composed.
 
 ## Installation
-Currently [OSX binaries are provided for sumoshell](https://github.com/SumoLogic/sumoshell/releases). Simply extract the archive and place the binaries on your path. 
+Currently [OSX and Linux binaries are provided for sumoshell](https://github.com/SumoLogic/sumoshell/releases). Simply extract the archive and place the binaries on your path. 
 
 If you run a different OS or would prefer to install from source, it's easy to build from source. Given a working [go](https://golang.org/doc/install) installation, run:
 ```
@@ -36,8 +36,8 @@ The sumo operator performs 3 steps:
 
 After using the `sumo` operator, the output will be in JSON. To re-render the output in a human-readable form, `|` the results of your query into one of the three `render` operators.
 
-1. `render-basic`: Capable of rendering aggregate and non-aggregate data. Mimics curses style CLIs by calculating the terminal height and printing new lines to the end to keep your text aligned.
-2. `render`: Curses based renderer for rendering tabular data
+1. `render-basic`: Capable of rendering aggregate and non-aggregate data. Mimics curses style CLIs by calculating the terminal height and printing new lines to the end to keep your text aligned. Add `nowraw` to drop the raw data when an aggregate isn't present.
+2. `render`: Curses based renderer for rendering tabular data.
 3. `graph`: Curses based renderer for rendering tabular data as a bar chart.
 
 
@@ -45,7 +45,7 @@ After using the `sumo` operator, the output will be in JSON. To re-render the ou
 
 sumoshell supports a basic parse operator similar to the `parse` operator in `SumoLogic`. Queries take the form:
 ```
-... | parse "[pattern=*] pattern2:'*' <morePatterns=(*)" as pattern, pattern2, more | ...
+... | parse "[pattern=*] pattern2:'*' morePatterns=(*)" as pattern, pattern2, more | ...
 ```
 
 ### Filtering Data
