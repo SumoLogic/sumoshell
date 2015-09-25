@@ -1,5 +1,5 @@
 # sumoshell
-`Sumoshell` is collection of utilities to improve analyzing log files written in Go. Each individual command acts as a phase in a pipeline to get the answer you want. Sumoshell brings a lot of the functionality of Sumo Logic to the command line.
+`Sumoshell` is collection of utilities to improve analyzing log files written in Go. `grep` can't tell that some log lines span multiple individual lines. Parsing out fields is cumbersome. Aggregating is basically impossible, and there is now good way to view the results. In Sumoshell, each individual command acts as a phase in a pipeline to get the answer you want. Sumoshell brings a lot of the functionality of [Sumo Logic](www.sumologic.com) to the command line.
 
 Commands should start with
 `sumo` which will transform logs into the json format `sumoshell` uses. Commands should end with `render` `render-basic` or `graph` which render the output to the terminal. Each operator is a stand-alone binary allowing them to be easily composed.
