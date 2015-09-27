@@ -12,9 +12,9 @@ func uiColumn(column string) bool {
 		return false
 	}
 
-    if column == "_raw" {
-        return false
-    }
+	if column == "_raw" {
+		return false
+	}
 	return true
 }
 

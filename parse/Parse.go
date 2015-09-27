@@ -1,7 +1,6 @@
-package main
+package parse
 
 import "log"
-import "os"
 import "strings"
 import "github.com/SumoLogic/sumoshell/util"
 import "regexp"
@@ -16,34 +15,29 @@ type Parser struct {
 const Wildcard = '*'
 const genericError = "parse takes arguments like: `parse \"[key=*]\" as key`\n"
 
-func main() {
-
-	if len(os.Args) < 2 {
+func Build(args []string) (error, Parser) {
+	// [parse x as y, z, w]
+	if len(args) < 2 {
 		log.Printf("Error! No arguments provided.")
 		log.Printf(genericError)
-		return
+		return util.ParseError("Error! No arguments provided\n" + genericError), Parser{}
 	}
-	parseExpression := os.Args[1]
+	parseExpression := args[1]
 	numExtractions := findNumExtractions(parseExpression)
-	//         (parse, str)	(as)  (foo, bar, baz)
+	//         (parse pattern)	(as)  (foo, bar, baz)
 	expectedArgs := 2 + 1 + numExtractions
-	if len(os.Args) < expectedArgs {
-		log.Printf(genericError)
-		log.Printf("Expected more arguments\n")
-		return
+	if len(args) < expectedArgs {
+		return util.ParseError("Expected more arguments\n" + genericError), Parser{}
 	}
-	as := os.Args[2]
+	as := args[2]
 	if as != "as" {
-		log.Printf(genericError)
-		log.Printf("Expected `as`\n")
-		return
+		return util.ParseError("Expacted `as` got " + as + "\n" + genericError), Parser{}
 	}
-	extractions := make([]string, len(os.Args)-3)
-	for i, arg := range os.Args[3:] {
+	extractions := make([]string, len(args)-3)
+	for i, arg := range args[3:] {
 		extractions[i] = strings.Trim(arg, ",")
 	}
-	util.ConnectToStdIn(Parser{parseExpression, extractions,
-		regexFromPat(parseExpression), util.NewJsonWriter()})
+	return nil, Parser{parseExpression, extractions, regexFromPat(parseExpression), util.NewJsonWriter()}
 }
 
 func findNumExtractions(parseExpression string) int {

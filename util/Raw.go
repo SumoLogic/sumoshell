@@ -23,6 +23,12 @@ type SumoAggOperator interface {
 	Flush()
 }
 
+type ParseError string
+
+func (e ParseError) Error() string {
+	return string(e)
+}
+
 func ConnectToStdIn(operator SumoOperator) {
 	fi, _ := os.Stdin.Stat() // get the FileInfo struct describing the standard input.
 	if (fi.Mode() & os.ModeCharDevice) == 0 {
