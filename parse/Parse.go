@@ -15,7 +15,7 @@ type Parser struct {
 const Wildcard = '*'
 const genericError = "parse takes arguments like: `parse \"[key=*]\" as key`\n"
 
-func Build(args []string) (error, Parser) {
+func Build(args []string) (error, util.SumoOperator) {
 	// [parse x as y, z, w]
 	if len(args) < 2 {
 		log.Printf("Error! No arguments provided.")

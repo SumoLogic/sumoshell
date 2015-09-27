@@ -34,7 +34,7 @@ func ConnectToStdIn(operator SumoOperator) {
 	if (fi.Mode() & os.ModeCharDevice) == 0 {
 		ConnectToReader(operator, os.Stdin)
 	} else {
-		fmt.Printf("No input")
+		fmt.Println("No input")
 		return
 	}
 }
