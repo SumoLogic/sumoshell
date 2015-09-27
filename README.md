@@ -1,4 +1,6 @@
 # sumoshell
+
+[![Join the chat at https://gitter.im/SumoLogic/sumoshell](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/SumoLogic/sumoshell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 `Sumoshell` is collection of utilities to improve analyzing log files written in Go. `grep` can't tell that some log lines span multiple individual lines. Parsing out fields is cumbersome. Aggregating is basically impossible, and there is no good way to view the results. In Sumoshell, each individual command acts as a phase in a pipeline to get the answer you want. Sumoshell brings a lot of the functionality of [Sumo Logic](www.sumologic.com) to the command line.
 
 Commands should start with
