@@ -67,19 +67,19 @@ sumoshell currently supports 3 aggregate operators:
 
 1. `count`. Example queries:
   ```
-  ... | count # number of rows
-  ... | count key # number of rows per key
+  ... | count           # number of rows
+  ... | count key       # number of rows per key
   ... | count key value # number of rows per the cartesian product of (key, value)
   ```
 
 2. `sumosum` Example queries:
   ```
-  ... | sumosum k # sum of all k's
+  ... | sumosum k      # sum of all k's
   ... | sumosum v by k # sum of all v's by k
   ```
 
 3. `average` Example queries:
   ```
-  ... | average k # average of all k's
+  ... | average k      # average of all k's
   ... | average v by k # average of all v's by k
   ```
