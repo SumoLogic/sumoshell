@@ -15,29 +15,30 @@ type Parser struct {
 const Wildcard = '*'
 const genericError = "parse takes arguments like: `parse \"[key=*]\" as key`\n"
 
-func Build(args []string) (error, util.SumoOperator) {
+func Build(args []string) (util.SumoOperator, error) {
 	// [parse x as y, z, w]
 	if len(args) < 2 {
 		log.Printf("Error! No arguments provided.")
 		log.Printf(genericError)
-		return util.ParseError("Error! No arguments provided\n" + genericError), Parser{}
+		return nil, util.ParseError("Error! No arguments provided\n" + genericError)
 	}
 	parseExpression := args[1]
 	numExtractions := findNumExtractions(parseExpression)
 	//         (parse pattern)	(as)  (foo, bar, baz)
 	expectedArgs := 2 + 1 + numExtractions
 	if len(args) < expectedArgs {
-		return util.ParseError("Expected more arguments\n" + genericError), Parser{}
+		return nil, util.ParseError("Expected more arguments\n" + genericError)
 	}
 	as := args[2]
 	if as != "as" {
-		return util.ParseError("Expacted `as` got " + as + "\n" + genericError), Parser{}
+		return nil, util.ParseError("Expacted `as` got " + as + "\n" + genericError)
 	}
 	extractions := make([]string, len(args)-3)
 	for i, arg := range args[3:] {
 		extractions[i] = strings.Trim(arg, ",")
 	}
-	return nil, Parser{parseExpression, extractions, regexFromPat(parseExpression), util.NewJsonWriter()}
+	ret := Parser{parseExpression, extractions, regexFromPat(parseExpression), util.NewJsonWriter()}
+	return &ret, nil
 }
 
 func findNumExtractions(parseExpression string) int {

@@ -1,9 +1,7 @@
-package main
+package filter
 
 import (
 	"github.com/SumoLogic/sumoshell/util"
-	"log"
-	"os"
 )
 
 type FilterOperator struct {
@@ -12,19 +10,21 @@ type FilterOperator struct {
 	output *util.JsonWriter
 }
 
-const genericError = "where takes arguments like: `where x = y`"
+const genericError = "filter takes arguments like: `filter x = y`"
 
-func main() {
-	if len(os.Args) < 4 {
-		log.Printf("Error! Not enough arguments provided.")
-		log.Printf(genericError)
-		return
+func Build(args []string) (util.SumoOperator, error) {
+	if len(args) < 4 {
+		return nil, util.ParseError("Error! Not enough arguments provided.\n" + genericError)
 	}
 
-	key := os.Args[1]
-	value := os.Args[3]
+	key := args[1]
+	eq := args[2]
+	if eq != "=" {
+		return nil, util.ParseError("Expected `=` found `" + eq + "`\n" + genericError)
+	}
+	value := args[3]
 
-	util.ConnectToStdIn(FilterOperator{key, value, util.NewJsonWriter()})
+	return &FilterOperator{key, value, util.NewJsonWriter()}, nil
 }
 
 func (w FilterOperator) Process(inp map[string]interface{}) {
