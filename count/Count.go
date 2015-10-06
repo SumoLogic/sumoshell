@@ -1,10 +1,8 @@
-package main
+package count
 
 import (
 	"github.com/SumoLogic/sumoshell/group"
 	"github.com/SumoLogic/sumoshell/util"
-	"os"
-	"time"
 )
 
 type count struct {
@@ -20,36 +18,17 @@ func makeCount() count {
 
 func aggregateCount(output grouper.Merger, key string, base map[string]interface{}) util.SumoAggOperator {
 	ct := 0
-	ticker := time.NewTicker(100 * time.Millisecond)
 	count := count{&ct, base, output.Write}
-	go flush(count, ticker)
 	return count
 }
 
-func main() {
-	relevantArgs := os.Args[1:]
-
-	if len(relevantArgs) == 0 {
-		ticker := time.NewTicker(1 * time.Second)
-		ct := makeCount()
-		go flush(ct, ticker)
-		util.ConnectToStdIn(ct)
-		ct.Flush()
-	} else if len(relevantArgs) > 0 {
-		keyFields := relevantArgs
+func Build(args []string) (util.SumoAggOperator, error) {
+	if len(args) == 0 {
+		return makeCount(), nil
+	} else {
+		keyFields := args
 		// key is meaningless for count
-		agg := grouper.NewAggregate(aggregateCount, keyFields, "")
-		util.ConnectToStdIn(agg)
-		agg.Flush()
-	}
-}
-
-func flush(ct count, ticker *time.Ticker) {
-	for {
-		select {
-		case <-ticker.C:
-			ct.Flush()
-		}
+		return grouper.NewAggregate(aggregateCount, keyFields, ""), nil
 	}
 }
 
