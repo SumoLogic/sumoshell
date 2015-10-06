@@ -1,4 +1,6 @@
 # sumoshell
+[![Join the chat at https://gitter.im/SumoLogic/sumoshell](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/SumoLogic/sumoshell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 `Sumoshell` is collection of utilities to improve analyzing log files written in Go. `grep` can't tell that some log lines span multiple individual lines. Parsing out fields is cumbersome. Aggregating is basically impossible, and there is no good way to view the results. In Sumoshell, each individual command acts as a phase in a pipeline to get the answer you want. Sumoshell brings a lot of the functionality of [Sumo Logic](www.sumologic.com) to the command line.
 
 Commands should start with
@@ -65,19 +67,22 @@ sumoshell currently supports 3 aggregate operators:
 
 1. `count`. Example queries:
   ```
-  ... | ss count # number of rows
-  ... | ss count key # number of rows per key
+  ... | ss count           # number of rows
+  ... | ss count key       # number of rows per key
   ... | ss count key value # number of rows per the cartesian product of (key, value)
+
   ```
 
 2. `sumosum` Example queries:
   ```
-  ... | ss sum k # sum of all k's
+  ... | ss sum k      # sum of all k's
   ... | ss sum v by k # sum of all v's by k
+
   ```
 
 3. `average` Example queries:
   ```
-  ... | ss average k # average of all k's
+  ... | ss average k      # average of all k's
   ... | ss average v by k # average of all v's by k
+
   ```
