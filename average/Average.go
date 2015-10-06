@@ -32,6 +32,8 @@ func aggregateAverage(output grouper.Merger, key string, base map[string]interfa
 }
 
 func Build(args []string) (util.SumoAggOperator, error) {
+	args = args[1:]
+
 	if len(args) == 1 {
 		return makeAverage(args[0]), nil
 	} else if len(args) > 1 {

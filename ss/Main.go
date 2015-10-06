@@ -6,6 +6,7 @@ import (
 	"github.com/SumoLogic/sumoshell/count"
 	"github.com/SumoLogic/sumoshell/filter"
 	"github.com/SumoLogic/sumoshell/parse"
+	"github.com/SumoLogic/sumoshell/sum"
 	"github.com/SumoLogic/sumoshell/util"
 	"os"
 	"time"
@@ -21,8 +22,9 @@ func main() {
 	}
 
 	aggOperators := map[string]AggBuilder{
-		"count": count.Build,
+		"count":   count.Build,
 		"average": average.Build,
+		"sum":     sum.Build,
 	}
 
 	args := os.Args

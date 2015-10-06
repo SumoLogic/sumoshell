@@ -23,6 +23,7 @@ func aggregateCount(output grouper.Merger, key string, base map[string]interface
 }
 
 func Build(args []string) (util.SumoAggOperator, error) {
+	args = args[1:]
 	if len(args) == 0 {
 		return makeCount(), nil
 	} else {
