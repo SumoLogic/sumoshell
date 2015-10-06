@@ -1,12 +1,10 @@
-package main
+package average
 
 import (
 	"fmt"
 	"github.com/SumoLogic/sumoshell/group"
 	"github.com/SumoLogic/sumoshell/util"
-	"os"
 	"strconv"
-	"time"
 )
 
 type average struct {
@@ -24,47 +22,25 @@ func makeAverage(key string) average {
 	v := 0.0
 	ready := false
 	return average{&samp, &v, key, make(map[string]interface{}), &ready, util.NewJsonWriter().Write}
-
 }
 
 func aggregateAverage(output grouper.Merger, key string, base map[string]interface{}) util.SumoAggOperator {
 	samp := 0
 	v := 0.0
 	ready := false
-	ticker := time.NewTicker(100 * time.Millisecond)
-	avg := average{&samp, &v, key, base, &ready, output.Write}
-	go flush(avg, ticker)
-	return avg
+	return average{&samp, &v, key, base, &ready, output.Write}
 }
 
-func main() {
-	relevantArgs := os.Args[1:]
-
-	if len(relevantArgs) == 1 {
-		ticker := time.NewTicker(1 * time.Second)
-		avg := makeAverage(relevantArgs[0])
-		go flush(avg, ticker)
-		util.ConnectToStdIn(avg)
-		avg.Flush()
-	} else if len(relevantArgs) > 1 {
-		key := relevantArgs[0]
-		//_ := relevantArgs[1]
-		keyFields := relevantArgs[2:]
-		agg := grouper.NewAggregate(aggregateAverage, keyFields, key)
-		util.ConnectToStdIn(agg)
-		agg.Flush()
+func Build(args []string) (util.SumoAggOperator, error) {
+	if len(args) == 1 {
+		return makeAverage(args[0]), nil
+	} else if len(args) > 1 {
+		key := args[0]
+		//_ := args[1]
+		keyFields := args[2:]
+		return grouper.NewAggregate(aggregateAverage, keyFields, key), nil
 	} else {
-		fmt.Println("Need a argument to average (`avg keyname`)")
-	}
-
-}
-
-func flush(avg average, ticker *time.Ticker) {
-	for {
-		select {
-		case <-ticker.C:
-			avg.Flush()
-		}
+		return nil, util.ParseError("Need a argument to average (`avg keyname`)")
 	}
 }
 

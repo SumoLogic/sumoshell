@@ -22,6 +22,7 @@ func main() {
 
 	aggOperators := map[string]AggBuilder{
 		"count": count.Build,
+		"average": average.Build,
 	}
 
 	args := os.Args
