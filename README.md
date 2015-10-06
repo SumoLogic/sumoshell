@@ -18,7 +18,7 @@ go install ./...
 ## Usage
 Like [SumoLogic](https://www.sumologic.com), sumoshell enables you pass log data through a series of transformations to get your final result. Pipelines start with a source (`tail`, `cat`, etc.) followed by the `sumo` operator. An example pipeline might be:
 
-```tail -f logfile | sumo "ERROR" | parse "thread=*]" | count thread | render-basic```
+```tail -f logfile | sumo "ERROR" | ss parse "thread=*]" | ss count thread | render-basic```
 
 This would produce a count of log messages matching error by thead. In the basic renderer, the output would look like:
 ```
@@ -47,14 +47,14 @@ After using the `sumo` operator, the output will be in JSON. To re-render the ou
 
 sumoshell supports a basic parse operator similar to the `parse` operator in `SumoLogic`. Queries take the form:
 ```
-... | parse "[pattern=*] pattern2:'*' morePatterns=(*)" as pattern, pattern2, more | ...
+... | ss parse "[pattern=*] pattern2:'*' morePatterns=(*)" as pattern, pattern2, more | ...
 ```
 
 ### Filtering Data
 
 sumoshell supports a filter operator similar to the `where` operator in `SumoLogic`. Queries take the form:
 ```
-... | parse "[host=*]" as host | filter host = server1 
+... | ss parse "[host=*]" as host | ss filter host = server1 
 ```
 
 This will drop any log lines that don't have `server1` as the host.
@@ -65,19 +65,19 @@ sumoshell currently supports 3 aggregate operators:
 
 1. `count`. Example queries:
   ```
-  ... | count # number of rows
-  ... | count key # number of rows per key
-  ... | count key value # number of rows per the cartesian product of (key, value)
+  ... | ss count # number of rows
+  ... | ss count key # number of rows per key
+  ... | ss count key value # number of rows per the cartesian product of (key, value)
   ```
 
 2. `sumosum` Example queries:
   ```
-  ... | sumosum k # sum of all k's
-  ... | sumosum v by k # sum of all v's by k
+  ... | ss sum k # sum of all k's
+  ... | ss sum v by k # sum of all v's by k
   ```
 
 3. `average` Example queries:
   ```
-  ... | average k # average of all k's
-  ... | average v by k # average of all v's by k
+  ... | ss average k # average of all k's
+  ... | ss average v by k # average of all v's by k
   ```

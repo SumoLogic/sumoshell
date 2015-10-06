@@ -15,6 +15,7 @@ func main() {
 	renderState := render.NewConnectedRenderState(flush)
 	createUi(renderState)
 }
+
 func createUi(state *render.RenderState) {
 	err := ui.Init()
 	if err != nil {
