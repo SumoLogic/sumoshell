@@ -29,8 +29,8 @@ _Id   _count   thread
 1     4        A        
 2     1        B      
 ```
-### The `sumo` operator
-The sumo operator performs 3 steps: 
+### The `sumo search` operator
+`sumo search` takes an optional filter parameter to allow for basic searching. The sumo operator performs 3 steps: 
 
 1. Break a text file into logical log messages. This merges things like stack traces into a single message for easy searching.
 2. Allow basic searching.
