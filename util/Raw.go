@@ -8,6 +8,7 @@ import "encoding/json"
 import "os"
 import "bufio"
 import "log"
+import "strconv"
 
 type RawInputHandler struct {
 	output io.Writer
@@ -177,4 +178,8 @@ func (writer *JsonWriter) Write(inp map[string]interface{}) {
 		writer.writer.Write(jsonBytes)
 		writer.writer.Write([]byte{'\n'})
 	}
+}
+
+func CoerceNumber (v interface{}) (float64, error) {
+	return strconv.ParseFloat(fmt.Sprint(v), 64)
 }

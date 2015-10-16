@@ -5,6 +5,7 @@ import (
 	"github.com/SumoLogic/sumoshell/average"
 	"github.com/SumoLogic/sumoshell/count"
 	"github.com/SumoLogic/sumoshell/filter"
+	"github.com/SumoLogic/sumoshell/expr"
 	"github.com/SumoLogic/sumoshell/parse"
 	"github.com/SumoLogic/sumoshell/sum"
 	"github.com/SumoLogic/sumoshell/util"
@@ -19,6 +20,7 @@ func main() {
 	operators := map[string]Builder{
 		"parse":  parse.Build,
 		"filter": filter.Build,
+		"expr": expr.Build,
 	}
 
 	aggOperators := map[string]AggBuilder{
