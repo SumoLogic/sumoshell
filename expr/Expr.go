@@ -1,15 +1,15 @@
-package expr 
+package expr
 
 import (
-	"github.com/SumoLogic/sumoshell/util"
-	"strings"
-	"os/exec"
 	"fmt"
+	"github.com/SumoLogic/sumoshell/util"
+	"os/exec"
+	"strings"
 )
 
 type ExprOperator struct {
-	lsh string
-	expr string
+	lsh    string
+	expr   string
 	output *util.JsonWriter
 }
 
@@ -38,7 +38,7 @@ func (w ExprOperator) Process(inp map[string]interface{}) {
 			} else {
 				s = fmt.Sprintf("%v=\"%v\"", k, v)
 			}
-	        	vars = append(vars, s)	
+			vars = append(vars, s)
 		}
 		varStr := strings.Join(vars, ";")
 		pythonCmd := varStr + "; print " + w.expr
@@ -55,7 +55,7 @@ func (w ExprOperator) Process(inp map[string]interface{}) {
 			inp[w.lsh] = numRep
 		} else {
 			inp[w.lsh] = strOut
-		}	
+		}
 		w.output.Write(inp)
 	}
 }

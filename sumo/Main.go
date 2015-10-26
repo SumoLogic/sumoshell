@@ -19,6 +19,7 @@ type AggBuilder func([]string) (util.SumoAggOperator, error)
 var operators = map[string]Builder{
 	"parse":  parse.Build,
 	"filter": filter.Build,
+	"expr":   expr.Build,
 }
 
 var aggOperators = map[string]AggBuilder{

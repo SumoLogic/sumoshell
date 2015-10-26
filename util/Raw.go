@@ -180,6 +180,6 @@ func (writer *JsonWriter) Write(inp map[string]interface{}) {
 	}
 }
 
-func CoerceNumber (v interface{}) (float64, error) {
+func CoerceNumber(v interface{}) (float64, error) {
 	return strconv.ParseFloat(fmt.Sprint(v), 64)
 }
