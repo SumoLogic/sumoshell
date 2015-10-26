@@ -4,7 +4,7 @@
 `Sumoshell` is collection of utilities to improve analyzing log files written in Go. `grep` can't tell that some log lines span multiple individual lines. Parsing out fields is cumbersome. Aggregating is basically impossible, and there is no good way to view the results. In Sumoshell, each individual command acts as a phase in a pipeline to get the answer you want. Sumoshell brings a lot of the functionality of [Sumo Logic](www.sumologic.com) to the command line.
 
 Commands should start with
-`sumo` which will transform logs into the json format `sumoshell` uses. Commands should end with `render` `render-basic` or `graph` which render the output to the terminal. Each operator is a stand-alone binary allowing them to be easily composed.
+`sumo search [filter]` which will transform logs into the json format `sumoshell` uses. Commands should end with `render` `render-basic` or `graph` which render the output to the terminal. Each operator is a stand-alone binary allowing them to be easily composed.
 
 ## Installation
 Currently [OSX and Linux binaries are provided for sumoshell](https://github.com/SumoLogic/sumoshell/releases). Simply extract the archive and place the binaries on your path. 
@@ -20,17 +20,17 @@ go install ./...
 ## Usage
 Like [SumoLogic](https://www.sumologic.com), sumoshell enables you pass log data through a series of transformations to get your final result. Pipelines start with a source (`tail`, `cat`, etc.) followed by the `sumo` operator. An example pipeline might be:
 
-```tail -f logfile | sumo "ERROR" | ss parse "thread=*]" | ss count thread | render-basic```
+```tail -f logfile | sumo search "ERROR" | sumo parse "thread=*]" | sumo count thread | render-basic```
 
-This would produce a count of log messages matching error by thead. In the basic renderer, the output would look like:
+This would produce a count of log messages matching `ERROR` by thead. In the basic renderer, the output would look like:
 ```
 _Id   _count   thread   
 0     4        C        
 1     4        A        
 2     1        B      
 ```
-### The `sumo` operator
-The sumo operator performs 3 steps: 
+### The `sumo search` operator
+`sumo search` takes an optional filter parameter to allow for basic searching. The sumo operator performs 3 steps: 
 
 1. Break a text file into logical log messages. This merges things like stack traces into a single message for easy searching.
 2. Allow basic searching.
@@ -49,14 +49,14 @@ After using the `sumo` operator, the output will be in JSON. To re-render the ou
 
 sumoshell supports a basic parse operator similar to the `parse` operator in `SumoLogic`. Queries take the form:
 ```
-... | ss parse "[pattern=*] pattern2:'*' morePatterns=(*)" as pattern, pattern2, more | ...
+... | sumo parse "[pattern=*] pattern2:'*' morePatterns=(*)" as pattern, pattern2, more | ...
 ```
 
 ### Filtering Data
 
 sumoshell supports a filter operator similar to the `where` operator in `SumoLogic`. Queries take the form:
 ```
-... | ss parse "[host=*]" as host | ss filter host = server1 
+... | sumo parse "[host=*]" as host | sumo filter host = server1 
 ```
 
 This will drop any log lines that don't have `server1` as the host.
@@ -67,22 +67,22 @@ sumoshell currently supports 3 aggregate operators:
 
 1. `count`. Example queries:
   ```
-  ... | ss count           # number of rows
-  ... | ss count key       # number of rows per key
-  ... | ss count key value # number of rows per the cartesian product of (key, value)
+  ... | sumo count           # number of rows
+  ... | sumo count key       # number of rows per key
+  ... | sumo count key value # number of rows per the cartesian product of (key, value)
 
   ```
 
 2. `sumosum` Example queries:
   ```
-  ... | ss sum k      # sum of all k's
-  ... | ss sum v by k # sum of all v's by k
+  ... | sumo sum k      # sum of all k's
+  ... | sumo sum v by k # sum of all v's by k
 
   ```
 
 3. `average` Example queries:
   ```
-  ... | ss average k      # average of all k's
-  ... | ss average v by k # average of all v's by k
+  ... | sumo average k      # average of all k's
+  ... | sumo average v by k # average of all v's by k
 
   ```

@@ -52,7 +52,13 @@ func findNumExtractions(parseExpression string) int {
 }
 
 func regexFromPat(pat string) *regexp.Regexp {
-	regex := ".*?" + strings.Replace(regexp.QuoteMeta(pat), "\\*", "(.*?)", -1) + ".*"
+	regex := ".*?" + strings.Replace(regexp.QuoteMeta(pat), "\\*", "(.*?)", -1) 
+	if strings.HasSuffix(pat, "*") {
+		regex += "$"
+	
+	} else {
+		regex += ".*$"
+	}	
 	return regexp.MustCompile(regex)
 }
 

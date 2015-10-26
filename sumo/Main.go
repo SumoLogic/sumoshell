@@ -1,39 +1,99 @@
 package main
 
-import "os"
-import "bufio"
-import "io"
-import "github.com/SumoLogic/sumoshell/util"
-import "strings"
+import (
+	"fmt"
+	"github.com/SumoLogic/sumoshell/average"
+	"github.com/SumoLogic/sumoshell/count"
+	"github.com/SumoLogic/sumoshell/filter"
+	"github.com/SumoLogic/sumoshell/parse"
+	"github.com/SumoLogic/sumoshell/search"
+	"github.com/SumoLogic/sumoshell/sum"
+	"github.com/SumoLogic/sumoshell/util"
+	"os"
+	"time"
+)
+
+type Builder func([]string) (util.SumoOperator, error)
+type AggBuilder func([]string) (util.SumoAggOperator, error)
+
+var operators = map[string]Builder{
+	"parse":  parse.Build,
+	"filter": filter.Build,
+}
+
+var aggOperators = map[string]AggBuilder{
+	"count":   count.Build,
+	"average": average.Build,
+	"sum":     sum.Build,
+}
 
 func main() {
-	if len(os.Args[1:]) > 0 {
-		read(os.Args[1])
+
+	args := os.Args
+	if len(args) == 1 {
+		fmt.Println("Arguments expected")
 	} else {
-		read("")
+		selectingArg := args[1]
+		actualArgs := os.Args[1:]
+		nonAggWorked := connectNonAggOperator(selectingArg, actualArgs)
+		if nonAggWorked {
+			return
+		}
+
+		aggWorked := connectAggOperator(selectingArg, actualArgs)
+		if aggWorked {
+			return
+		}
+
+		if selectingArg == "search" {
+			search.BuildAndConnect(actualArgs)
+			return
+		}
+		fmt.Println("Operator " + selectingArg + " unrecognized")
 	}
 }
 
-func read(filterString string) {
-	r, w := io.Pipe()
-	handler := util.NewRawInputHandler(w)
-	go util.ConnectToReader(SumoFilter{filterString, util.NewJsonWriter()}, r)
-	bio := bufio.NewReader(os.Stdin)
-	var line, hasMoreInLine, err = bio.ReadLine()
-	for err != io.EOF || hasMoreInLine {
-		handler.Process(line)
-		line, hasMoreInLine, err = bio.ReadLine()
+func connectAggOperator(selector string, args []string) bool {
+	aggBuilder, aggOk := aggOperators[selector]
+	if !aggOk {
+		return false
 	}
-	handler.Flush()
+
+	aggOperator, err := aggBuilder(args)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		ticker := time.NewTicker(100 * time.Millisecond)
+		go flush(aggOperator, ticker)
+		util.ConnectToStdIn(aggOperator)
+		// Flush when the stream completes to ensure all data is accounted for
+		aggOperator.Flush()
+	}
+	return true
 }
 
-type SumoFilter struct {
-	param  string
-	output *util.JsonWriter
+func connectNonAggOperator(selector string, args []string) bool {
+	builder, ok := operators[selector]
+	if ok {
+		operator, err := builder(args)
+		handleErrorOrWire(operator, err)
+	}
+	return ok
 }
 
-func (filt SumoFilter) Process(inp map[string]interface{}) {
-	if strings.Contains(util.ExtractRaw(inp), filt.param) {
-		filt.output.Write(inp)
+func handleErrorOrWire(operator util.SumoOperator, err error) {
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		util.ConnectToStdIn(operator)
+	}
+}
+
+func flush(aggOp util.SumoAggOperator, ticker *time.Ticker) {
+	for {
+		select {
+		case <-ticker.C:
+			aggOp.Flush()
+		}
 	}
 }
