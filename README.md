@@ -65,7 +65,7 @@ This will drop any log lines that don't have `server1` as the host.
 
 sumoshell currently supports 3 aggregate operators:
 
-1. `count`. Example queries:
+1. `count`   Example queries:
   ```
   ... | sumo count           # number of rows
   ... | sumo count key       # number of rows per key
@@ -73,7 +73,7 @@ sumoshell currently supports 3 aggregate operators:
 
   ```
 
-2. `sumosum` Example queries:
+2. `sum`     Example queries:
   ```
   ... | sumo sum k      # sum of all k's
   ... | sumo sum v by k # sum of all v's by k
