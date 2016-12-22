@@ -51,7 +51,8 @@ func ConnectToReader(operator SumoOperator, reader io.Reader) {
 			err := json.Unmarshal(buf, &rawMsg)
 			buf = []byte{}
 			if err != nil {
-				log.Println("Error parsing json")
+				log.Println("Error parsing json", err)
+				log.Println(string(line))
 			} else {
 				mapMessage, ok := rawMsg.(map[string]interface{})
 				if ok {
