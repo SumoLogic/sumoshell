@@ -8,7 +8,11 @@ import "encoding/json"
 import "os"
 import "bufio"
 import "log"
-import "strconv"
+import (
+	"strconv"
+	"sync"
+	"sort"
+)
 
 type RawInputHandler struct {
 	output io.Writer
@@ -103,6 +107,10 @@ func CreateStartRelation() map[string]interface{} {
 	return map[string]interface{}{Type: StartRelation}
 }
 
+func CreateStartRelationMeta(origin string) map[string]interface{} {
+	return map[string]interface{}{Type: StartRelation, Meta: origin}
+}
+
 func CreateEndRelation() map[string]interface{} {
 	return map[string]interface{}{Type: EndRelation}
 }
@@ -164,10 +172,11 @@ func (handler *RawInputHandler) Flush() {
 
 type JsonWriter struct {
 	writer io.Writer
+	mu *sync.Mutex
 }
 
 func NewJsonWriter() *JsonWriter {
-	return &JsonWriter{os.Stdout}
+	return &JsonWriter{os.Stdout, &sync.Mutex{}}
 }
 
 func (writer *JsonWriter) Write(inp map[string]interface{}) {
@@ -176,11 +185,41 @@ func (writer *JsonWriter) Write(inp map[string]interface{}) {
 	if err != nil {
 		fmt.Printf("ERROR!", err)
 	} else {
+		writer.mu.Lock()
 		writer.writer.Write(jsonBytes)
 		writer.writer.Write([]byte{'\n'})
+		writer.mu.Unlock()
 	}
 }
 
 func CoerceNumber(v interface{}) (float64, error) {
 	return strconv.ParseFloat(fmt.Sprint(v), 64)
+}
+
+type Datum []map[string]interface{}
+type By func(p1, p2 *map[string]interface{}) bool
+func (a datumSorter) Len() int           { return len(a.data) }
+func (a datumSorter) Swap(i, j int)      { a.data[i], a.data[j] = a.data[j], a.data[i] }
+// planetSorter joins a By function and a slice of Planets to be sorted.
+type datumSorter struct {
+	data Datum
+	by      func(p1, p2 map[string]interface{}) bool // Closure used in the Less method.
+}
+
+func (a datumSorter) Less(i, j int) bool {
+	return a.by(a.data[i], a.data[j])
+}
+
+func SortByField(field string, data Datum) {
+	by := func(p1, p2 map[string]interface{}) bool {
+		v1, err1 := CoerceNumber(p1[field])
+		v2, err2 := CoerceNumber(p2[field])
+
+		if err1 != nil || err2 != nil {
+			panic(err1)
+		}
+
+		return v1 < v2
+	}
+	sort.Sort(sort.Reverse(&datumSorter{data, by}))
 }
