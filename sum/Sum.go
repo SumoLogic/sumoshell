@@ -17,6 +17,8 @@ type sum struct {
 	mu *sync.Mutex
 }
 
+const Sum = "_sum"
+
 func makeSum(key string) sum {
 	sumV := 0.0
 	return sum{&sumV, key, make(map[string]interface{}), util.NewJsonWriter().Write, &sync.Mutex{}}
@@ -36,7 +38,7 @@ func Build(args []string) (util.SumoAggOperator, error) {
 		key := args[0]
 		//_ := relevantArgs[1]
 		keyFields := args[2:]
-		return grouper.NewAggregate(aggregateSum, keyFields, key), nil
+		return grouper.NewAggregate(aggregateSum, keyFields, key, Sum), nil
 	} else {
 		return nil, util.ParseError("Need a argument to average (`sum field`)")
 	}
@@ -55,7 +57,7 @@ func currentState(s sum) map[string]interface{} {
 	for key, val := range s.base {
 		ret[key] = val
 	}
-	ret["_sum"] = *s.sum
+	ret[Sum] = *s.sum
 	return ret
 }
 

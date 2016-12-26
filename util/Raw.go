@@ -11,6 +11,7 @@ import "log"
 import (
 	"strconv"
 	"sync"
+	"sort"
 )
 
 type RawInputHandler struct {
@@ -193,4 +194,32 @@ func (writer *JsonWriter) Write(inp map[string]interface{}) {
 
 func CoerceNumber(v interface{}) (float64, error) {
 	return strconv.ParseFloat(fmt.Sprint(v), 64)
+}
+
+type Datum []map[string]interface{}
+type By func(p1, p2 *map[string]interface{}) bool
+func (a datumSorter) Len() int           { return len(a.data) }
+func (a datumSorter) Swap(i, j int)      { a.data[i], a.data[j] = a.data[j], a.data[i] }
+// planetSorter joins a By function and a slice of Planets to be sorted.
+type datumSorter struct {
+	data Datum
+	by      func(p1, p2 map[string]interface{}) bool // Closure used in the Less method.
+}
+
+func (a datumSorter) Less(i, j int) bool {
+	return a.by(a.data[i], a.data[j])
+}
+
+func SortByField(field string, data Datum) {
+	by := func(p1, p2 map[string]interface{}) bool {
+		v1, err1 := CoerceNumber(p1[field])
+		v2, err2 := CoerceNumber(p2[field])
+
+		if err1 != nil || err2 != nil {
+			panic(err1)
+		}
+
+		return v1 < v2
+	}
+	sort.Sort(sort.Reverse(&datumSorter{data, by}))
 }

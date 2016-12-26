@@ -6,6 +6,7 @@ import (
 	"sync"
 )
 
+const Count = "_count"
 type count struct {
 	ct     *int
 	base   map[string]interface{}
@@ -31,7 +32,7 @@ func Build(args []string) (util.SumoAggOperator, error) {
 	} else {
 		keyFields := args
 		// key is meaningless for count
-		return grouper.NewAggregate(aggregateCount, keyFields, ""), nil
+		return grouper.NewAggregate(aggregateCount, keyFields, "", Count), nil
 	}
 }
 
@@ -48,11 +49,13 @@ func currentState(ct count) map[string]interface{} {
 	for key, val := range ct.base {
 		ret[key] = val
 	}
-	ret["_count"] = *ct.ct
+	ret[Count] = *ct.ct
 	return ret
 }
 
 func (ct count) Process(inp map[string]interface{}) {
+	ct.mu.Lock()
+	defer ct.mu.Unlock()
 	if util.IsPlus(inp) {
 		*ct.ct += 1
 	}

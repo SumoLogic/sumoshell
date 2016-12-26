@@ -23,8 +23,9 @@ type builder func(Merger, string, map[string]interface{}) util.SumoAggOperator
 func NewAggregate(
 	constructor builder,
 	by []string,
-	key string) Grouper {
-	merger := NewMerger()
+	key string,
+	sortCol string) Grouper {
+	merger := NewMerger(sortCol)
 	ctor := func(base map[string]interface{}) util.SumoAggOperator {
 		return constructor(merger, key, base)
 	}
@@ -76,11 +77,12 @@ type Merger struct {
 	aggregate map[int]map[string]interface{}
 	output    *util.JsonWriter
 	mu        *sync.Mutex
+	sortCol   string
 }
 
-func NewMerger() Merger {
+func NewMerger(sortCol string) Merger {
 	mu := &sync.Mutex{}
-	m := Merger{make(map[int]map[string]interface{}), util.NewJsonWriter(), mu}
+	m := Merger{make(map[int]map[string]interface{}), util.NewJsonWriter(), mu, sortCol}
 	ticker := time.NewTicker(100 * time.Millisecond)
 	go flush(m, ticker)
 	return m
@@ -113,12 +115,25 @@ func (m Merger) Write(inp map[string]interface{}) {
 	m.Process(inp)
 }
 
+
 func (m Merger) Flush() {
 	m.mu.Lock()
 	m.output.Write(util.CreateStartRelationMeta("merger"))
 	// Output keys sorted by index so the ui is consistent
-	for i := 0; i < len(m.aggregate); i++ {
-		m.output.Write(util.CreateRelation(m.aggregate[i]))
+	if m.sortCol == "" {
+		for i := 0; i < len(m.aggregate); i++ {
+			m.output.Write(util.CreateRelation(m.aggregate[i]))
+		}
+	} else {
+		aggs := make([]map[string]interface{}, 0, len(m.aggregate))
+		for i := 0; i < len(m.aggregate); i++ {
+			aggs = append(aggs, m.aggregate[i])
+		}
+		util.SortByField(m.sortCol, aggs)
+		for i := 0; i < len(aggs); i++ {
+			m.output.Write(util.CreateRelation(aggs[i]))
+
+		}
 	}
 	m.output.Write(util.CreateEndRelation())
 	queryString := strings.Join(os.Args[0:], " ")

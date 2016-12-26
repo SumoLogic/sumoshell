@@ -8,6 +8,7 @@ import (
 	"sync"
 )
 
+const Avg = "_avg"
 type average struct {
 	samples *int
 	sum     *float64
@@ -41,7 +42,7 @@ func Build(args []string) (util.SumoAggOperator, error) {
 		key := args[0]
 		//_ := args[1]
 		keyFields := args[2:]
-		return grouper.NewAggregate(aggregateAverage, keyFields, key), nil
+		return grouper.NewAggregate(aggregateAverage, keyFields, key, Avg), nil
 	} else {
 		return nil, util.ParseError("Need a argument to average (`avg keyname`)")
 	}
@@ -62,7 +63,7 @@ func currentState(a average) map[string]interface{} {
 	for key, val := range a.base {
 		ret[key] = val
 	}
-	ret["_avg"] = *a.sum / float64(*a.samples)
+	ret[Avg] = *a.sum / float64(*a.samples)
 	return ret
 }
 
