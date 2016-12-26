@@ -12,7 +12,7 @@ import (
 	"github.com/SumoLogic/sumoshell/util"
 	"os"
 	"time"
-	"sync"
+	// "sync"
 )
 
 type Builder func([]string) (util.SumoOperator, error)
@@ -67,13 +67,10 @@ func connectAggOperator(selector string, args []string) bool {
 	} else {
 		ticker := time.NewTicker(100 * time.Millisecond)
 		done := make(chan bool)
-		var wg = sync.WaitGroup{}
-		wg.Add(1)
 		go flush(aggOperator, ticker, done)
 		util.ConnectToStdIn(aggOperator)
 		ticker.Stop()
 		done <- true
-		wg.Wait()
 		// Flush when the stream completes to ensure all data is accounted for
 		aggOperator.Flush()
 	}
@@ -102,7 +99,7 @@ func flush(aggOp util.SumoAggOperator, ticker *time.Ticker, done chan bool) {
 		select {
 		case <-ticker.C:
 			aggOp.Flush()
-		case <- done:
+		case <-done:
 			return
 		}
 	}

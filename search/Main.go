@@ -6,7 +6,6 @@ import "io"
 import "github.com/SumoLogic/sumoshell/util"
 import (
 	"strings"
-	"fmt"
 )
 
 func BuildAndConnect(args []string) {
