@@ -3,22 +3,24 @@ package count
 import (
 	"github.com/SumoLogic/sumoshell/group"
 	"github.com/SumoLogic/sumoshell/util"
+	"sync"
 )
 
 type count struct {
 	ct     *int
 	base   map[string]interface{}
 	output func(map[string]interface{})
+	mu     *sync.Mutex
 }
 
 func makeCount() count {
 	ct := 0
-	return count{&ct, make(map[string]interface{}), util.NewJsonWriter().Write}
+	return count{&ct, make(map[string]interface{}), util.NewJsonWriter().Write, &sync.Mutex{}}
 }
 
 func aggregateCount(output grouper.Merger, key string, base map[string]interface{}) util.SumoAggOperator {
 	ct := 0
-	count := count{&ct, base, output.Write}
+	count := count{&ct, base, output.Write, &sync.Mutex{}}
 	return count
 }
 
@@ -34,6 +36,8 @@ func Build(args []string) (util.SumoAggOperator, error) {
 }
 
 func (ct count) Flush() {
+	ct.mu.Lock()
+	defer ct.mu.Unlock()
 	ct.output(util.CreateStartRelation())
 	ct.output(util.CreateRelation(currentState(ct)))
 	ct.output(util.CreateEndRelation())

@@ -15,6 +15,7 @@ type Renderer struct {
 	height      int64
 	width       int64
 	rowsPrinted *int64
+	inRelation *bool
 }
 
 func main() {
@@ -30,11 +31,12 @@ func main() {
 	width, _ := strconv.ParseInt(wstr, 10, 64)
 
 	rows := int64(0)
+	inRelation := false
 
 	if len(os.Args) == 2 && os.Args[1] == "noraw" {
-		util.ConnectToStdIn(Renderer{false, &m, &cols, height, width, &rows})
+		util.ConnectToStdIn(Renderer{false, &m, &cols, height, width, &rows, &inRelation})
 	} else {
-		util.ConnectToStdIn(Renderer{true, &m, &cols, height, width, &rows})
+		util.ConnectToStdIn(Renderer{true, &m, &cols, height, width, &rows, &inRelation})
 	}
 }
 
@@ -72,16 +74,29 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		fmt.Print("\n")
 	}
 	if util.IsStartRelation(inp) {
-		fmt.Println("======")
+		if (*r.inRelation) {
+			panic("Already in relation")
+		}
+		*r.inRelation = true
+		for i := int64(0); i < *r.rowsPrinted; i++ {
+			// Clear the row
+			fmt.Printf("\033[2K")
+			// Go up one row
+			fmt.Printf("\033[1A")
+		}
+		*r.rowsPrinted = 0
 		for _, col := range *r.cols {
 			width := (*r.colWidths)[col]
 			spaces := strings.Repeat(" ", width-len(col))
 			fmt.Printf("%v%s", col, spaces)
 		}
-		*r.rowsPrinted += 2
+		*r.rowsPrinted += 1
 		fmt.Printf("\n")
 	}
 	if util.IsRelation(inp) {
+		if (!*r.inRelation) {
+			panic("Can't get relation before StartRelation")
+		}
 		colsWidth := render.Columns([]map[string]interface{}{inp})
 		colNames := render.ColumnNames(colsWidth)
 		*r.cols = colNames
@@ -97,11 +112,6 @@ func (r Renderer) Process(inp map[string]interface{}) {
 	}
 
 	if util.IsEndRelation(inp) {
-		if *r.rowsPrinted < r.height-1 {
-			for i := *r.rowsPrinted; i < r.height; i++ {
-				fmt.Printf("\n")
-			}
-		}
-		*r.rowsPrinted = 0
+		*r.inRelation = false
 	}
 }

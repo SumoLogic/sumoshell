@@ -8,7 +8,10 @@ import "encoding/json"
 import "os"
 import "bufio"
 import "log"
-import "strconv"
+import (
+	"strconv"
+	"sync"
+)
 
 type RawInputHandler struct {
 	output io.Writer
@@ -103,6 +106,10 @@ func CreateStartRelation() map[string]interface{} {
 	return map[string]interface{}{Type: StartRelation}
 }
 
+func CreateStartRelationMeta(origin string) map[string]interface{} {
+	return map[string]interface{}{Type: StartRelation, Meta: origin}
+}
+
 func CreateEndRelation() map[string]interface{} {
 	return map[string]interface{}{Type: EndRelation}
 }
@@ -164,10 +171,11 @@ func (handler *RawInputHandler) Flush() {
 
 type JsonWriter struct {
 	writer io.Writer
+	mu *sync.Mutex
 }
 
 func NewJsonWriter() *JsonWriter {
-	return &JsonWriter{os.Stdout}
+	return &JsonWriter{os.Stdout, &sync.Mutex{}}
 }
 
 func (writer *JsonWriter) Write(inp map[string]interface{}) {
@@ -176,8 +184,10 @@ func (writer *JsonWriter) Write(inp map[string]interface{}) {
 	if err != nil {
 		fmt.Printf("ERROR!", err)
 	} else {
+		writer.mu.Lock()
 		writer.writer.Write(jsonBytes)
 		writer.writer.Write([]byte{'\n'})
+		writer.mu.Unlock()
 	}
 }
 

@@ -15,6 +15,7 @@ type Grouper struct {
 	merger      Merger
 	by          []string
 	key         string
+	mu 	    *sync.Mutex
 }
 
 type builder func(Merger, string, map[string]interface{}) util.SumoAggOperator
@@ -27,10 +28,14 @@ func NewAggregate(
 	ctor := func(base map[string]interface{}) util.SumoAggOperator {
 		return constructor(merger, key, base)
 	}
-	return Grouper{ctor, make(map[string]util.SumoAggOperator), merger, by, key}
+
+	mu := &sync.Mutex{}
+	return Grouper{ctor, make(map[string]util.SumoAggOperator), merger, by, key, mu}
 }
 
 func (g Grouper) Flush() {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	for _, v := range g.operators {
 		v.Flush()
 	}
@@ -38,6 +43,8 @@ func (g Grouper) Flush() {
 }
 
 func (g Grouper) Process(inp map[string]interface{}) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	var keys []string
 	for _, key := range g.by {
 		val, ok := inp[key]
@@ -107,16 +114,16 @@ func (m Merger) Write(inp map[string]interface{}) {
 }
 
 func (m Merger) Flush() {
-	m.output.Write(util.CreateStartRelation())
 	m.mu.Lock()
+	m.output.Write(util.CreateStartRelationMeta("merger"))
 	// Output keys sorted by index so the ui is consistent
 	for i := 0; i < len(m.aggregate); i++ {
 		m.output.Write(util.CreateRelation(m.aggregate[i]))
 	}
-	m.mu.Unlock()
 	m.output.Write(util.CreateEndRelation())
 	queryString := strings.Join(os.Args[0:], " ")
 	m.output.Write(util.CreateMeta(map[string]interface{}{"_queryString": queryString}))
+	m.mu.Unlock()
 }
 func flush(m Merger, ticker *time.Ticker) {
 	for {
