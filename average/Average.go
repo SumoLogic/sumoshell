@@ -5,6 +5,7 @@ import (
 	"github.com/SumoLogic/sumoshell/group"
 	"github.com/SumoLogic/sumoshell/util"
 	"strconv"
+	"sync"
 )
 
 type average struct {
@@ -13,22 +14,22 @@ type average struct {
 	key     string
 	// DO NOT MODIFY BASE
 	base   map[string]interface{}
-	ready  *bool
+	mu     *sync.Mutex
 	output func(map[string]interface{})
 }
 
 func makeAverage(key string) average {
 	samp := 0
 	v := 0.0
-	ready := false
-	return average{&samp, &v, key, make(map[string]interface{}), &ready, util.NewJsonWriter().Write}
+	mu := sync.Mutex{}
+	return average{&samp, &v, key, make(map[string]interface{}), &mu, util.NewJsonWriter().Write}
 }
 
 func aggregateAverage(output grouper.Merger, key string, base map[string]interface{}) util.SumoAggOperator {
 	samp := 0
 	v := 0.0
-	ready := false
-	return average{&samp, &v, key, base, &ready, output.Write}
+	mu := sync.Mutex{}
+	return average{&samp, &v, key, base, &mu, output.Write}
 }
 
 func Build(args []string) (util.SumoAggOperator, error) {
@@ -47,7 +48,9 @@ func Build(args []string) (util.SumoAggOperator, error) {
 }
 
 func (avg average) Flush() {
-	if *avg.ready {
+	avg.mu.Lock()
+	defer avg.mu.Unlock()
+	if *avg.samples > 0  {
 		avg.output(util.CreateStartRelation())
 		avg.output(util.CreateRelation(currentState(avg)))
 		avg.output(util.CreateEndRelation())
@@ -64,13 +67,14 @@ func currentState(a average) map[string]interface{} {
 }
 
 func (a average) Process(inp map[string]interface{}) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
 	v, keyInMap := inp[a.key]
 	if keyInMap {
 		f, keyIsNumber := strconv.ParseFloat(fmt.Sprint(v), 64)
 		if keyIsNumber == nil {
 			*a.samples += 1
 			*a.sum += f
-			*a.ready = true
 		}
 	}
 }

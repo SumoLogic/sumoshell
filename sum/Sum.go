@@ -5,6 +5,7 @@ import (
 	"github.com/SumoLogic/sumoshell/group"
 	"github.com/SumoLogic/sumoshell/util"
 	"strconv"
+	"sync"
 )
 
 type sum struct {
@@ -13,17 +14,17 @@ type sum struct {
 	// DO NOT MODIFY BASE
 	base   map[string]interface{}
 	output func(map[string]interface{})
+	mu *sync.Mutex
 }
 
 func makeSum(key string) sum {
 	sumV := 0.0
-	return sum{&sumV, key, make(map[string]interface{}), util.NewJsonWriter().Write}
-
+	return sum{&sumV, key, make(map[string]interface{}), util.NewJsonWriter().Write, &sync.Mutex{}}
 }
 
 func aggregateSum(output grouper.Merger, key string, base map[string]interface{}) util.SumoAggOperator {
 	sumV := 0.0
-	return sum{&sumV, key, base, output.Write}
+	return sum{&sumV, key, base, output.Write, &sync.Mutex{}}
 }
 
 func Build(args []string) (util.SumoAggOperator, error) {
@@ -42,6 +43,8 @@ func Build(args []string) (util.SumoAggOperator, error) {
 }
 
 func (sumOp sum) Flush() {
+	sumOp.mu.Lock()
+	defer sumOp.mu.Unlock()
 	sumOp.output(util.CreateStartRelation())
 	sumOp.output(util.CreateRelation(currentState(sumOp)))
 	sumOp.output(util.CreateEndRelation())
@@ -57,6 +60,8 @@ func currentState(s sum) map[string]interface{} {
 }
 
 func (s sum) Process(inp map[string]interface{}) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	v, keyInMap := inp[s.key]
 	if keyInMap {
 		f, keyIsNumber := strconv.ParseFloat(fmt.Sprint(v), 64)
