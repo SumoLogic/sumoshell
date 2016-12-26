@@ -15,7 +15,7 @@ type Grouper struct {
 	merger      Merger
 	by          []string
 	key         string
-	mu 	    *sync.Mutex
+	mu          *sync.Mutex
 }
 
 type builder func(Merger, string, map[string]interface{}) util.SumoAggOperator
@@ -115,9 +115,13 @@ func (m Merger) Write(inp map[string]interface{}) {
 	m.Process(inp)
 }
 
-
 func (m Merger) Flush() {
 	m.mu.Lock()
+	defer m.mu.Unlock()
+	if len(m.aggregate) == 0 {
+		fmt.Println("No aggregate")
+		return
+	}
 	m.output.Write(util.CreateStartRelationMeta("merger"))
 	// Output keys sorted by index so the ui is consistent
 	if m.sortCol == "" {
@@ -138,8 +142,8 @@ func (m Merger) Flush() {
 	m.output.Write(util.CreateEndRelation())
 	queryString := strings.Join(os.Args[0:], " ")
 	m.output.Write(util.CreateMeta(map[string]interface{}{"_queryString": queryString}))
-	m.mu.Unlock()
 }
+
 func flush(m Merger, ticker *time.Ticker) {
 	for {
 		select {

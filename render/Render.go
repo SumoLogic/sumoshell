@@ -15,7 +15,7 @@ type Renderer struct {
 	height      int64
 	width       int64
 	rowsPrinted *int64
-	inRelation *bool
+	inRelation  *bool
 }
 
 func main() {
@@ -74,7 +74,7 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		fmt.Print("\n")
 	}
 	if util.IsStartRelation(inp) {
-		if (*r.inRelation) {
+		if *r.inRelation {
 			panic("Already in relation")
 		}
 		*r.inRelation = true
@@ -94,7 +94,10 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		fmt.Printf("\n")
 	}
 	if util.IsRelation(inp) {
-		if (!*r.inRelation) {
+		if *r.rowsPrinted >= 10 {
+			return
+		}
+		if !*r.inRelation {
 			panic("Can't get relation before StartRelation")
 		}
 		colsWidth := render.Columns([]map[string]interface{}{inp})
