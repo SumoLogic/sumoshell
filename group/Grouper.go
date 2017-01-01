@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 )
 
 type Grouper struct {
@@ -83,8 +82,6 @@ type Merger struct {
 func NewMerger(sortCol string) Merger {
 	mu := &sync.Mutex{}
 	m := Merger{make(map[int]map[string]interface{}), util.NewJsonWriter(), mu, sortCol}
-	ticker := time.NewTicker(100 * time.Millisecond)
-	go flush(m, ticker)
 	return m
 }
 
@@ -138,13 +135,4 @@ func (m Merger) Flush() {
 	m.output.Write(util.CreateEndRelation())
 	queryString := strings.Join(os.Args[0:], " ")
 	m.output.Write(util.CreateMeta(map[string]interface{}{"_queryString": queryString}))
-}
-
-func flush(m Merger, ticker *time.Ticker) {
-	for {
-		select {
-		case <-ticker.C:
-			m.Flush()
-		}
-	}
 }
