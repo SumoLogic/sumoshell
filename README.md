@@ -4,7 +4,7 @@
 `Sumoshell` is collection of utilities to improve analyzing log files written in Go. `grep` can't tell that some log lines span multiple individual lines. Parsing out fields is cumbersome. Aggregating is basically impossible, and there is no good way to view the results. In Sumoshell, each individual command acts as a phase in a pipeline to get the answer you want. Sumoshell brings a lot of the functionality of [Sumo Logic](https://www.sumologic.com) to the command line.
 
 Commands should start with
-`sumo search [filter]` which will transform logs into the json format `sumoshell` uses. Commands should end with `render` `render-basic` or `graph` which render the output to the terminal. Each operator is a stand-alone binary allowing them to be easily composed.
+`sumo search [filter]` which will transform logs into the json format `sumoshell` uses. Commands should end with `render` or `graph` which render the output to the terminal. Each operator is a stand-alone binary allowing them to be easily composed.
 
 ## Installation
 [OSX and Linux binaries are provided for sumoshell](https://github.com/SumoLogic/sumoshell/releases). Simply extract the archive and place the binaries on your path. 
@@ -20,7 +20,7 @@ go install ./...
 ## Usage
 Like [SumoLogic](https://www.sumologic.com), sumoshell enables you pass log data through a series of transformations to get your final result. Pipelines start with a source (`tail`, `cat`, etc.) followed by the `sumo` operator. An example pipeline might be:
 
-```tail -f logfile | sumo search "ERROR" | sumo parse "thread=*]" | sumo count thread | render-basic```
+```tail -f logfile | sumo search "ERROR" | sumo parse "thread=*]" | sumo count thread | render```
 
 This would produce a count of log messages matching `ERROR` by thead. In the basic renderer, the output would look like:
 ```
@@ -40,9 +40,8 @@ _Id   _count   thread
 
 After using the `sumo` operator, the output will be in JSON. To re-render the output in a human-readable form, `|` the results of your query into one of the three `render` operators.
 
-1. `render-basic`: Capable of rendering aggregate and non-aggregate data. Mimics curses style CLIs by calculating the terminal height and printing new lines to the end to keep your text aligned. Add `nowraw` to drop the raw data when an aggregate isn't present.
-2. `render`: Curses based renderer for rendering tabular data.
-3. `graph`: Curses based renderer for rendering tabular data as a bar chart.
+1. `render`: Capable of rendering aggregate and non-aggregate data. Add `nowraw` to drop the raw data when an aggregate isn't present. Aggregates are updated in place using terminal escape sequences.
+2. `graph`: Curses based renderer for rendering tabular data as a bar chart.
 
 
 ### Parsing Data
