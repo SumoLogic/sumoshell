@@ -96,10 +96,6 @@ func ExtractId(inp map[string]interface{}) int {
 	}
 }
 
-func WithId(id int) map[string]interface{} {
-	return map[string]interface{}{Id: id}
-}
-
 func (m Merger) Process(inp map[string]interface{}) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
