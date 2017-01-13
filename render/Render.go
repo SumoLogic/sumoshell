@@ -15,7 +15,7 @@ type Renderer struct {
 	height      int64
 	width       int64
 	rowsPrinted *int64
-	inRelation *bool
+	inRelation  *bool
 }
 
 func main() {
@@ -74,7 +74,7 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		fmt.Print("\n")
 	}
 	if util.IsStartRelation(inp) {
-		if (*r.inRelation) {
+		if *r.inRelation {
 			panic("Already in relation")
 		}
 		*r.inRelation = true
@@ -85,22 +85,25 @@ func (r Renderer) Process(inp map[string]interface{}) {
 			fmt.Printf("\033[1A")
 		}
 		*r.rowsPrinted = 0
-		for _, col := range *r.cols {
-			width := (*r.colWidths)[col]
-			spaces := strings.Repeat(" ", width-len(col))
-			fmt.Printf("%v%s", col, spaces)
+		if len(*r.cols) > 0 {
+			r.printHeader()
 		}
-		*r.rowsPrinted += 1
-		fmt.Printf("\n")
 	}
 	if util.IsRelation(inp) {
-		if (!*r.inRelation) {
+		// If we haven't printed the header yet
+		if *r.rowsPrinted >= 20 {
+			return
+		}
+		if !*r.inRelation {
 			panic("Can't get relation before StartRelation")
 		}
 		colsWidth := render.Columns([]map[string]interface{}{inp})
 		colNames := render.ColumnNames(colsWidth)
 		*r.cols = colNames
 		*r.colWidths = colsWidth
+		if *r.rowsPrinted == 0 {
+			r.printHeader()
+		}
 		for _, col := range colNames {
 			v, _ := inp[col]
 			vStr := fmt.Sprint(v)
@@ -114,4 +117,15 @@ func (r Renderer) Process(inp map[string]interface{}) {
 	if util.IsEndRelation(inp) {
 		*r.inRelation = false
 	}
+}
+
+func (r Renderer) printHeader() {
+	for _, col := range *r.cols {
+		width := (*r.colWidths)[col]
+		spaces := strings.Repeat(" ", width-len(col))
+		fmt.Printf("%v%s", col, spaces)
+	}
+	*r.rowsPrinted += 1
+	fmt.Printf("\n")
+
 }

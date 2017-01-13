@@ -9,9 +9,9 @@ import "os"
 import "bufio"
 import "log"
 import (
+	"sort"
 	"strconv"
 	"sync"
-	"sort"
 )
 
 type RawInputHandler struct {
@@ -151,17 +151,12 @@ func NewRawInputHandler(inp io.Writer) *RawInputHandler {
 	return &RawInputHandler{inp, []rune{}}
 }
 
-func NewRawInputHandlerStdout() *RawInputHandler {
-	return NewRawInputHandler(os.Stdout)
-}
-
 func (handler *RawInputHandler) Flush() {
 	m := make(map[string]interface{})
 	m[Raw] = string(handler.buff)
 	m[Type] = Plus
 	handler.buff = []rune{}
 	b, err := json.Marshal(m)
-	//fmt.Printf(b)
 	if err != nil {
 		fmt.Printf("ERROR!", err)
 	} else {
@@ -172,7 +167,7 @@ func (handler *RawInputHandler) Flush() {
 
 type JsonWriter struct {
 	writer io.Writer
-	mu *sync.Mutex
+	mu     *sync.Mutex
 }
 
 func NewJsonWriter() *JsonWriter {
@@ -198,12 +193,14 @@ func CoerceNumber(v interface{}) (float64, error) {
 
 type Datum []map[string]interface{}
 type By func(p1, p2 *map[string]interface{}) bool
-func (a datumSorter) Len() int           { return len(a.data) }
-func (a datumSorter) Swap(i, j int)      { a.data[i], a.data[j] = a.data[j], a.data[i] }
+
+func (a datumSorter) Len() int      { return len(a.data) }
+func (a datumSorter) Swap(i, j int) { a.data[i], a.data[j] = a.data[j], a.data[i] }
+
 // planetSorter joins a By function and a slice of Planets to be sorted.
 type datumSorter struct {
 	data Datum
-	by      func(p1, p2 map[string]interface{}) bool // Closure used in the Less method.
+	by   func(p1, p2 map[string]interface{}) bool // Closure used in the Less method.
 }
 
 func (a datumSorter) Less(i, j int) bool {
@@ -216,6 +213,7 @@ func SortByField(field string, data Datum) {
 		v2, err2 := CoerceNumber(p2[field])
 
 		if err1 != nil || err2 != nil {
+			fmt.Print(data)
 			panic(err1)
 		}
 

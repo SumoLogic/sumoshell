@@ -4,7 +4,9 @@ import "os"
 import "bufio"
 import "io"
 import "github.com/SumoLogic/sumoshell/util"
-import "strings"
+import (
+	"strings"
+)
 
 func BuildAndConnect(args []string) {
 	if len(args[1:]) > 0 {

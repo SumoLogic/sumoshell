@@ -7,6 +7,7 @@ import (
 )
 
 const Count = "_count"
+
 type count struct {
 	ct     *int
 	base   map[string]interface{}

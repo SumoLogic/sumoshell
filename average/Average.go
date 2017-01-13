@@ -9,6 +9,7 @@ import (
 )
 
 const Avg = "_avg"
+
 type average struct {
 	samples *int
 	sum     *float64
@@ -51,7 +52,7 @@ func Build(args []string) (util.SumoAggOperator, error) {
 func (avg average) Flush() {
 	avg.mu.Lock()
 	defer avg.mu.Unlock()
-	if *avg.samples > 0  {
+	if *avg.samples > 0 {
 		avg.output(util.CreateStartRelation())
 		avg.output(util.CreateRelation(currentState(avg)))
 		avg.output(util.CreateEndRelation())

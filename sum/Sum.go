@@ -14,7 +14,7 @@ type sum struct {
 	// DO NOT MODIFY BASE
 	base   map[string]interface{}
 	output func(map[string]interface{})
-	mu *sync.Mutex
+	mu     *sync.Mutex
 }
 
 const Sum = "_sum"

@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 )
 
 type Grouper struct {
@@ -15,7 +14,7 @@ type Grouper struct {
 	merger      Merger
 	by          []string
 	key         string
-	mu 	    *sync.Mutex
+	mu          *sync.Mutex
 }
 
 type builder func(Merger, string, map[string]interface{}) util.SumoAggOperator
@@ -83,8 +82,6 @@ type Merger struct {
 func NewMerger(sortCol string) Merger {
 	mu := &sync.Mutex{}
 	m := Merger{make(map[int]map[string]interface{}), util.NewJsonWriter(), mu, sortCol}
-	ticker := time.NewTicker(100 * time.Millisecond)
-	go flush(m, ticker)
 	return m
 }
 
@@ -99,10 +96,6 @@ func ExtractId(inp map[string]interface{}) int {
 	}
 }
 
-func WithId(id int) map[string]interface{} {
-	return map[string]interface{}{Id: id}
-}
-
 func (m Merger) Process(inp map[string]interface{}) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -115,9 +108,9 @@ func (m Merger) Write(inp map[string]interface{}) {
 	m.Process(inp)
 }
 
-
 func (m Merger) Flush() {
 	m.mu.Lock()
+	defer m.mu.Unlock()
 	m.output.Write(util.CreateStartRelationMeta("merger"))
 	// Output keys sorted by index so the ui is consistent
 	if m.sortCol == "" {
@@ -138,13 +131,4 @@ func (m Merger) Flush() {
 	m.output.Write(util.CreateEndRelation())
 	queryString := strings.Join(os.Args[0:], " ")
 	m.output.Write(util.CreateMeta(map[string]interface{}{"_queryString": queryString}))
-	m.mu.Unlock()
-}
-func flush(m Merger, ticker *time.Ticker) {
-	for {
-		select {
-		case <-ticker.C:
-			m.Flush()
-		}
-	}
 }
