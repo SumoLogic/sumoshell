@@ -40,7 +40,9 @@ _Id   _count   thread
 
 After using the `sumo` operator, the output will be in JSON. To re-render the output in a human-readable form, `|` the results of your query into one of the three `render` operators.
 
-1. `render`: Capable of rendering aggregate and non-aggregate data. Add `nowraw` to drop the raw data when an aggregate isn't present. Aggregates are updated in place using terminal escape sequences.
+1. `render`: Capable of rendering aggregate and non-aggregate data. 
+* Add `nowraw` to drop the raw data when an aggregate isn't present. 
+* Aggregates are updated in place using terminal escape sequences, with a limit of 20 shown. Add `all` to remove the limit. Aggregates will be rendered when the stream ends (ctrl+c)
 2. `graph`: Curses based renderer for rendering tabular data as a bar chart.
 
 
