@@ -7,8 +7,8 @@ import "strings"
 import "os/exec"
 import "os"
 import (
-	"strconv"
 	"os/signal"
+	"strconv"
 	"syscall"
 )
 
@@ -95,12 +95,12 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		for _, col := range colNames {
 			v, _ := inp[col]
 			vStr := fmt.Sprint(v)
-			spaces := strings.Repeat(" ", colsWidth[col] - len(vStr))
+			spaces := strings.Repeat(" ", colsWidth[col]-len(vStr))
 			finalStr := fmt.Sprintf("[%s=%v]%s", col, vStr, spaces)
-			if charsPrinted + int64(len(finalStr)) > r.width {
+			if charsPrinted+int64(len(finalStr)) > r.width {
 				availableChars := r.width - charsPrinted
 				if availableChars > 3 {
-					fmt.Printf(finalStr[:availableChars - 3])
+					fmt.Printf(finalStr[:availableChars-3])
 					fmt.Printf("...")
 					charsPrinted = r.width
 				}
@@ -151,7 +151,7 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		for _, col := range colNames {
 			v, _ := inp[col]
 			vStr := fmt.Sprint(v)
-			spaces := strings.Repeat(" ", colsWidth[col] - len(vStr))
+			spaces := strings.Repeat(" ", colsWidth[col]-len(vStr))
 			fmt.Printf("%v%s", vStr, spaces)
 		}
 		*r.rowsPrinted += 1
@@ -166,7 +166,7 @@ func (r Renderer) Process(inp map[string]interface{}) {
 func (r Renderer) printHeader() {
 	for _, col := range *r.cols {
 		width := (*r.colWidths)[col]
-		spaces := strings.Repeat(" ", width - len(col))
+		spaces := strings.Repeat(" ", width-len(col))
 		fmt.Printf("%v%s", col, spaces)
 	}
 	*r.rowsPrinted += 1
