@@ -6,7 +6,11 @@ import "github.com/SumoLogic/sumoshell/render-util"
 import "strings"
 import "os/exec"
 import "os"
-import "strconv"
+import (
+	"strconv"
+	"os/signal"
+	"syscall"
+)
 
 type Renderer struct {
 	showRaw     bool
@@ -16,6 +20,7 @@ type Renderer struct {
 	width       int64
 	rowsPrinted *int64
 	inRelation  *bool
+	limit       int64
 }
 
 func main() {
@@ -34,9 +39,48 @@ func main() {
 	inRelation := false
 
 	if len(os.Args) == 2 && os.Args[1] == "noraw" {
-		util.ConnectToStdIn(Renderer{false, &m, &cols, height, width, &rows, &inRelation})
+		util.ConnectToStdIn(Renderer{false, &m, &cols, height, width, &rows, &inRelation, 20})
+	} else if len(os.Args) == 2 && os.Args[1] == "all" {
+		c := make(chan os.Signal, 2)
+
+		// Ignore SIGTERM signals. We will stop running anyway when our input is over.
+		// This allows us to dump the current state
+		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+		go func() {
+			<-c
+		}()
+		rels := []map[string]interface{}{}
+		holder := relationHolder{&rels}
+		util.ConnectToStdIn(holder)
+		r := Renderer{false, &m, &cols, height, width, &rows, &inRelation, -1}
+		fmt.Println()
+		for _, item := range *holder.lastRelation {
+			r.Process(item)
+		}
 	} else {
-		util.ConnectToStdIn(Renderer{true, &m, &cols, height, width, &rows, &inRelation})
+		util.ConnectToStdIn(Renderer{true, &m, &cols, height, width, &rows, &inRelation, 20})
+	}
+}
+
+type relationHolder struct {
+	lastRelation *[]map[string]interface{}
+}
+
+func (r relationHolder) Process(inp map[string]interface{}) {
+	if util.IsPlus(inp) {
+		panic("all only supports aggregate data")
+	}
+	if util.IsStartRelation(inp) {
+		slice := []map[string]interface{}{inp}
+		*r.lastRelation = slice
+	}
+	if util.IsRelation(inp) {
+		slice := append(*r.lastRelation, inp)
+		*r.lastRelation = slice
+	}
+	if util.IsEndRelation(inp) {
+		slice := append(*r.lastRelation, inp)
+		*r.lastRelation = slice
 	}
 }
 
@@ -51,12 +95,12 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		for _, col := range colNames {
 			v, _ := inp[col]
 			vStr := fmt.Sprint(v)
-			spaces := strings.Repeat(" ", colsWidth[col]-len(vStr))
+			spaces := strings.Repeat(" ", colsWidth[col] - len(vStr))
 			finalStr := fmt.Sprintf("[%s=%v]%s", col, vStr, spaces)
-			if charsPrinted+int64(len(finalStr)) > r.width {
+			if charsPrinted + int64(len(finalStr)) > r.width {
 				availableChars := r.width - charsPrinted
 				if availableChars > 3 {
-					fmt.Printf(finalStr[:availableChars-3])
+					fmt.Printf(finalStr[:availableChars - 3])
 					fmt.Printf("...")
 					charsPrinted = r.width
 				}
@@ -91,7 +135,7 @@ func (r Renderer) Process(inp map[string]interface{}) {
 	}
 	if util.IsRelation(inp) {
 		// If we haven't printed the header yet
-		if *r.rowsPrinted >= 20 {
+		if *r.rowsPrinted >= r.limit && r.limit != -1 {
 			return
 		}
 		if !*r.inRelation {
@@ -107,7 +151,7 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		for _, col := range colNames {
 			v, _ := inp[col]
 			vStr := fmt.Sprint(v)
-			spaces := strings.Repeat(" ", colsWidth[col]-len(vStr))
+			spaces := strings.Repeat(" ", colsWidth[col] - len(vStr))
 			fmt.Printf("%v%s", vStr, spaces)
 		}
 		*r.rowsPrinted += 1
@@ -122,7 +166,7 @@ func (r Renderer) Process(inp map[string]interface{}) {
 func (r Renderer) printHeader() {
 	for _, col := range *r.cols {
 		width := (*r.colWidths)[col]
-		spaces := strings.Repeat(" ", width-len(col))
+		spaces := strings.Repeat(" ", width - len(col))
 		fmt.Printf("%v%s", col, spaces)
 	}
 	*r.rowsPrinted += 1
