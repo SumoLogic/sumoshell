@@ -3,7 +3,9 @@ package parse
 import "log"
 import "strings"
 import "github.com/SumoLogic/sumoshell/util"
-import "regexp"
+import (
+	"regexp"
+)
 
 type Parser struct {
 	pattern     string

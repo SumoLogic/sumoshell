@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"sync"
+	"strings"
 )
 
 type RawInputHandler struct {
@@ -128,7 +129,7 @@ func CreateMeta(inp map[string]interface{}) map[string]interface{} {
 func ExtractRaw(inp map[string]interface{}) string {
 	raw, ok := inp[Raw].(string)
 	if ok {
-		return raw
+		return strings.TrimRight(raw, "\n")
 	} else {
 		return ""
 	}
