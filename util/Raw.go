@@ -11,8 +11,8 @@ import "log"
 import (
 	"sort"
 	"strconv"
-	"sync"
 	"strings"
+	"sync"
 )
 
 type RawInputHandler struct {
