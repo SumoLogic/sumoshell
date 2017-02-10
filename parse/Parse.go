@@ -1,10 +1,10 @@
 package parse
 
-import "log"
-import "strings"
-import "github.com/SumoLogic/sumoshell/util"
 import (
 	"regexp"
+	"log"
+	"strings"
+	"github.com/SumoLogic/sumoshell/util"
 )
 
 type Parser struct {
@@ -20,8 +20,8 @@ const genericError = "parse takes arguments like: `parse \"[key=*]\" as key`\n"
 func Build(args []string) (util.SumoOperator, error) {
 	// [parse x as y, z, w]
 	if len(args) < 2 {
-		log.Printf("Error! No arguments provided.")
-		log.Printf(genericError)
+		log.Print("Error! No arguments provided.")
+		log.Print(genericError)
 		return nil, util.ParseError("Error! No arguments provided\n" + genericError)
 	}
 	parseExpression := args[1]
@@ -35,7 +35,7 @@ func Build(args []string) (util.SumoOperator, error) {
 	if as != "as" {
 		return nil, util.ParseError("Expacted `as` got " + as + "\n" + genericError)
 	}
-	extractions := make([]string, len(args)-3)
+	extractions := make([]string, len(args) - 3)
 	for i, arg := range args[3:] {
 		extractions[i] = strings.Trim(arg, ",")
 	}
@@ -67,7 +67,7 @@ func regexFromPat(pat string) *regexp.Regexp {
 func (p Parser) Process(inp map[string]interface{}) {
 	if util.IsPlus(inp) {
 		matches := p.regex.FindStringSubmatch(util.ExtractRaw(inp))
-		if len(matches) == 1+len(p.extractions) {
+		if len(matches) == 1 + len(p.extractions) {
 			for i, match := range matches[1:] {
 				inp[p.extractions[i]] = match
 			}
