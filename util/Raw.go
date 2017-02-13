@@ -1,17 +1,18 @@
 package util
 
-import "fmt"
-import "io"
-import "github.com/reiver/go-whitespace"
-import "bytes"
-import "encoding/json"
-import "os"
-import "bufio"
-import "log"
 import (
+	"io"
+	"os"
+	"fmt"
+	"bufio"
+	"encoding/json"
+	"log"
+	"bytes"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
+	"github.com/reiver/go-whitespace"
 )
 
 type RawInputHandler struct {
@@ -128,7 +129,7 @@ func CreateMeta(inp map[string]interface{}) map[string]interface{} {
 func ExtractRaw(inp map[string]interface{}) string {
 	raw, ok := inp[Raw].(string)
 	if ok {
-		return raw
+		return strings.TrimRight(raw, "\n")
 	} else {
 		return ""
 	}
