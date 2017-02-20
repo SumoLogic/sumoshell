@@ -33,7 +33,7 @@ func Build(args []string) (util.SumoOperator, error) {
 	}
 	as := args[2]
 	if as != "as" {
-		return nil, util.ParseError("Expacted `as` got " + as + "\n" + genericError)
+		return nil, util.ParseError("Expected `as` got " + as + "\n" + genericError)
 	}
 	extractions := make([]string, len(args) - 3)
 	for i, arg := range args[3:] {
