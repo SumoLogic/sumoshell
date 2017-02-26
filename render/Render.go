@@ -46,9 +46,9 @@ func main() {
 	rows := int64(0)
 	inRelation := false
 
-	if (len(os.Args) == 2 && os.Args[1] == "noraw") || renderAll {
+	if len(os.Args) == 2 && os.Args[1] == "noraw" {
 		util.ConnectToStdIn(Renderer{false, &m, &cols, height, width, &rows, &inRelation, 20})
-	} else if len(os.Args) == 2 && os.Args[1] == "all" {
+	} else if (len(os.Args) == 2 && os.Args[1] == "all") || renderAll {
 		c := make(chan os.Signal, 2)
 
 		// Ignore SIGTERM signals. We will stop running anyway when our input is over.
@@ -61,7 +61,6 @@ func main() {
 		holder := relationHolder{&rels}
 		util.ConnectToStdIn(holder)
 		r := Renderer{false, &m, &cols, height, width, &rows, &inRelation, -1}
-		fmt.Println()
 		for _, item := range *holder.lastRelation {
 			r.Process(item)
 		}
