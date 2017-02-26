@@ -30,15 +30,23 @@ func main() {
 	cmd.Stdin = os.Stdout
 	out, _ := cmd.Output()
 	wh := strings.Split(string(out), " ")
-	hstr := strings.Trim(wh[0], "\n")
-	wstr := strings.Trim(wh[1], "\n")
+	var hstr, wstr string
+	renderAll := false
+	if len(wh) == 1 {
+		hstr = "0"
+		wstr = "0"
+		renderAll = true
+	} else {
+		wstr = strings.Trim(wh[1], "\n")
+		hstr = strings.Trim(wh[0], "\n")
+	}
 	height, _ := strconv.ParseInt(hstr, 10, 64)
 	width, _ := strconv.ParseInt(wstr, 10, 64)
 
 	rows := int64(0)
 	inRelation := false
 
-	if len(os.Args) == 2 && os.Args[1] == "noraw" {
+	if (len(os.Args) == 2 && os.Args[1] == "noraw") || renderAll {
 		util.ConnectToStdIn(Renderer{false, &m, &cols, height, width, &rows, &inRelation, 20})
 	} else if len(os.Args) == 2 && os.Args[1] == "all" {
 		c := make(chan os.Signal, 2)

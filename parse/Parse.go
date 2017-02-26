@@ -1,10 +1,10 @@
 package parse
 
 import (
-	"regexp"
-	"log"
-	"strings"
 	"github.com/SumoLogic/sumoshell/util"
+	"log"
+	"regexp"
+	"strings"
 )
 
 type Parser struct {
@@ -35,7 +35,7 @@ func Build(args []string) (util.SumoOperator, error) {
 	if as != "as" {
 		return nil, util.ParseError("Expected `as` got " + as + "\n" + genericError)
 	}
-	extractions := make([]string, len(args) - 3)
+	extractions := make([]string, len(args)-3)
 	for i, arg := range args[3:] {
 		extractions[i] = strings.Trim(arg, ",")
 	}
@@ -67,7 +67,7 @@ func regexFromPat(pat string) *regexp.Regexp {
 func (p Parser) Process(inp map[string]interface{}) {
 	if util.IsPlus(inp) {
 		matches := p.regex.FindStringSubmatch(util.ExtractRaw(inp))
-		if len(matches) == 1 + len(p.extractions) {
+		if len(matches) == 1+len(p.extractions) {
 			for i, match := range matches[1:] {
 				inp[p.extractions[i]] = match
 			}
