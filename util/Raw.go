@@ -1,18 +1,18 @@
 package util
 
 import (
-	"io"
-	"os"
-	"fmt"
 	"bufio"
-	"encoding/json"
-	"log"
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"github.com/reiver/go-whitespace"
+	"io"
+	"log"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
-	"github.com/reiver/go-whitespace"
 )
 
 type RawInputHandler struct {
