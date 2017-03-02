@@ -64,11 +64,15 @@ func currentState(s sum) map[string]interface{} {
 func (s sum) Process(inp map[string]interface{}) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	v, keyInMap := inp[s.key]
-	if keyInMap {
-		f, keyIsNumber := strconv.ParseFloat(fmt.Sprint(v), 64)
-		if keyIsNumber == nil {
-			*s.sum += f
+	if util.IsStartRelation(inp) {
+		*s.sum = 0
+	} else if util.IsPlus(inp) || util.IsRelation(inp) {
+		v, keyInMap := inp[s.key]
+		if keyInMap {
+			f, err := strconv.ParseFloat(fmt.Sprint(v), 64)
+			if err == nil {
+				*s.sum += f
+			}
 		}
 	}
 }

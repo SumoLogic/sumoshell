@@ -57,7 +57,11 @@ func currentState(ct count) map[string]interface{} {
 func (ct count) Process(inp map[string]interface{}) {
 	ct.mu.Lock()
 	defer ct.mu.Unlock()
-	if util.IsPlus(inp) {
+	if util.IsStartRelation(inp) {
+		*ct.ct = 0
+	} else if util.IsEndRelation(inp) {
+		//ct.Flush()
+	} else if util.IsPlus(inp) || util.IsRelation(inp) {
 		*ct.ct += 1
 	}
 }
