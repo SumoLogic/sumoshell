@@ -71,12 +71,17 @@ func currentState(a average) map[string]interface{} {
 func (a average) Process(inp map[string]interface{}) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	v, keyInMap := inp[a.key]
-	if keyInMap {
-		f, keyIsNumber := strconv.ParseFloat(fmt.Sprint(v), 64)
-		if keyIsNumber == nil {
-			*a.samples += 1
-			*a.sum += f
+	if util.IsPlus(inp) || util.IsRelation(inp) {
+		v, keyInMap := inp[a.key]
+		if keyInMap {
+			f, keyIsNumber := strconv.ParseFloat(fmt.Sprint(v), 64)
+			if keyIsNumber == nil {
+				*a.samples += 1
+				*a.sum += f
+			}
 		}
+	} else if util.IsStartRelation(inp) {
+		*a.samples = 0
+		*a.sum = 0
 	}
 }
