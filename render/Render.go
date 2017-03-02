@@ -33,8 +33,8 @@ func main() {
 	var hstr, wstr string
 	renderAll := false
 	if len(wh) == 1 {
-		hstr = "0"
-		wstr = "0"
+		hstr = "9999"
+		wstr = "9999"
 		renderAll = true
 	} else {
 		wstr = strings.Trim(wh[1], "\n")
@@ -75,7 +75,13 @@ type relationHolder struct {
 
 func (r relationHolder) Process(inp map[string]interface{}) {
 	if util.IsPlus(inp) {
-		panic("all only supports aggregate data")
+		if len(*r.lastRelation) == 0 {
+			slice := []map[string]interface{}{inp}
+			*r.lastRelation = slice
+		} else {
+			slice := append(*r.lastRelation, inp)
+			*r.lastRelation = slice
+		}
 	}
 	if util.IsStartRelation(inp) {
 		slice := []map[string]interface{}{inp}
