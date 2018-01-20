@@ -36,6 +36,9 @@ _Id   _count   thread
 2. Allow basic searching.
 3. Transforms the log message into the sumoshell internal json format.
 
+### The `sumo json` operator
+For JSON logging, the `sumo json` operator will automatically parse JSON from your logs and extract key value pairs.
+
 ### Displaying results
 
 After using the `sumo` operator, the output will be in JSON. To re-render the output in a human-readable form, `|` the results of your query into one of the three `render` operators.
