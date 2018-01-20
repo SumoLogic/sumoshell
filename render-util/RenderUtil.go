@@ -2,9 +2,10 @@ package render
 
 import (
 	"fmt"
-	"github.com/SumoLogic/sumoshell/util"
 	"sort"
 	"strings"
+
+	"github.com/SumoLogic/sumoshell/util"
 )
 
 func uiColumn(column string) bool {
@@ -73,7 +74,23 @@ func LabelExtractor(columns []string) func(map[string]interface{}) string {
 }
 
 func length(inp interface{}) int {
-	return len(fmt.Sprint(inp)) + 3
+	return len(Format(inp)) + 3
+}
+
+func Format(inp interface{}) string {
+	return fmt.Sprintf(formatStr(inp), inp)
+}
+
+func formatStr(inp interface{}) string {
+	switch v := inp.(type) {
+	case float64:
+		if v == float64(int64(v)) {
+			return "%v"
+		}
+		return "%.2f"
+	default:
+		return "%v"
+	}
 }
 
 type RenderState struct {

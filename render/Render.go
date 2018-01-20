@@ -107,7 +107,7 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		*r.colWidths = colsWidth
 		for _, col := range colNames {
 			v, _ := inp[col]
-			vStr := fmt.Sprint(v)
+			vStr := render.Format(v) //fmt.Sprintf("%.2f", v)
 			spaces := strings.Repeat(" ", colsWidth[col]-len(vStr))
 			finalStr := fmt.Sprintf("[%s=%v]%s", col, vStr, spaces)
 			if charsPrinted+int64(len(finalStr)) > r.width {
@@ -163,11 +163,11 @@ func (r Renderer) Process(inp map[string]interface{}) {
 		}
 		for _, col := range colNames {
 			v, _ := inp[col]
-			vStr := fmt.Sprint(v)
+			vStr := render.Format(v)
 			spaces := strings.Repeat(" ", colsWidth[col]-len(vStr))
 			fmt.Printf("%v%s", vStr, spaces)
 		}
-		*r.rowsPrinted += 1
+		*r.rowsPrinted++
 		fmt.Printf("\n")
 	}
 
