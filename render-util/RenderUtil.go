@@ -83,8 +83,6 @@ func Format(inp interface{}) string {
 
 func formatStr(inp interface{}) string {
 	switch v := inp.(type) {
-	case float32:
-		return "%.2f"
 	case float64:
 		if v == float64(int64(v)) {
 			return "%v"
