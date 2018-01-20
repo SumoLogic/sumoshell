@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
+
+	"github.com/SumoLogic/sumoshell/sumojson"
+
 	"github.com/SumoLogic/sumoshell/average"
 	"github.com/SumoLogic/sumoshell/count"
 	"github.com/SumoLogic/sumoshell/expr"
@@ -10,8 +15,6 @@ import (
 	"github.com/SumoLogic/sumoshell/search"
 	"github.com/SumoLogic/sumoshell/sum"
 	"github.com/SumoLogic/sumoshell/util"
-	"os"
-	"time"
 	// "sync"
 )
 
@@ -49,6 +52,11 @@ func main() {
 
 		if selectingArg == "search" {
 			search.BuildAndConnect(actualArgs)
+			return
+		}
+
+		if selectingArg == "json" {
+			sumojson.BuildAndConnect(actualArgs)
 			return
 		}
 		fmt.Println("Operator " + selectingArg + " unrecognized")
