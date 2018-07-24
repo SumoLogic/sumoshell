@@ -1,3 +1,6 @@
+# Archived!
+We have chosen to archive sumoshell as we can not continue to support its growth.  The original author has created a spiritual successor called [angle-grinder](https://github.com/rcoh/angle-grinder) and we recommend you investigate that.
+
 # sumoshell
 [![Join the chat at https://gitter.im/SumoLogic/sumoshell](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/SumoLogic/sumoshell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
